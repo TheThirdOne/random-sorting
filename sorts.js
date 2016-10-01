@@ -40,7 +40,7 @@ function selectionSort(arr,comp){
 }
 
 function shellSort(arr,comp){
-  var h = 1
+  var h = 1;
   for(; h < arr.length; h = 3*h+1);
   for(; h > 0; h = Math.floor(h / 3)){
     for(var i = 0; i < h; i ++){
@@ -65,7 +65,7 @@ function insertCustom(arr,comp,start,increment,end){
 }
 
 function quickSort(arr,comp){
-  return quickSortRecurse(arr,comp,0,arr.length-1)  
+  return quickSortRecurse(arr,comp,0,arr.length-1);
 }
 
 //quicksort on a slice of the array
@@ -82,10 +82,10 @@ function partition(arr,comp,lo,hi){
   var k = lo;
   for(var i = lo; i < hi;i++){
     if(comp(arr[i],pivot) < 0){
-        let temp = arr[i];
-        arr[i]   = arr[k];
-        arr[k]   = temp;
-        k++;
+      let temp = arr[i];
+      arr[i]   = arr[k];
+      arr[k]   = temp;
+      k++;
     }
   }
   arr[hi] = arr[k];
@@ -129,7 +129,7 @@ function mergeSortRecurse(arr,comp,start,end,l){
 
 
 function quickInsertSort(arr,comp){
-  return quickInsertSortRecurse(arr,comp,0,arr.length-1)  
+  return quickInsertSortRecurse(arr,comp,0,arr.length-1);
 }
 
 //quicksort on a slice of the array
@@ -143,40 +143,42 @@ function quickInsertSortRecurse(arr,comp,lo,hi){
       insertCustom(arr,comp,lo,1,hi+1);
     }
 }
-
-
-function heapSort(arr, comp){
-    heapify(arr, comp)
-    for(var i = arr.length-1; i > 0;i--){
-      let t = arr[i];
-      arr[i] = arr[0];
-      arr[0] = t;
-      siftDown(arr, comp, 0, i-1)
-    }
+function heapSort(arr,comp){
+  heapSortCustom(arr,comp,start,end);
 }
-function heapify(arr, comp){
-    for(var i = Math.floor(((arr.length-1)-1)/2); i >= 0; i--){
-        siftDown(arr, comp, i, arr.length - 1);
-    }
-}
-function siftDown(arr, comp, root, end){
-    while(2*root + 1 <= end){
-        let child = 2*root+1;   
-        let tmp = root;           
 
-        if(comp(arr[child],arr[tmp])>0){
-            tmp = child;
-        }
-        if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
-            tmp = child + 1;
-        }
-        if(tmp  == root){
-            return;
-        }else{
-            let t = arr[root];
-            arr[root] = arr[tmp];
-            arr[tmp] = t;
-            root = tmp;
-        }
+function heapSortCustom(arr, comp,start,end){
+  heapify(arr, comp, start, end);
+  for(var i = arr.length-1; i > 0;i--){
+    let t = arr[i];
+    arr[i] = arr[0];
+    arr[0] = t;
+    siftDown(arr, comp, 0, start, i-1)
+  }
+}
+function heapify(arr, comp,start,end){
+  for(var i = Math.floor(((end-1)+start-1)/2); i >= 0; i--){
+    siftDown(arr, comp, i, start, end - 1);
+  }
+}
+function siftDown(arr, comp, root, start, end){
+  while(2*root + 1 - start <= end){
+    let child = 2*root+1-start;
+    let tmp = root;
+
+    if(comp(arr[child],arr[tmp])>0){
+      tmp = child;
     }
+    if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
+      tmp = child + 1;
+    }
+    if(tmp  == root){
+      return;
+    }else{
+      let t = arr[root];
+      arr[root] = arr[tmp];
+      arr[tmp] = t;
+      root = tmp;
+    }
+  }
 }
