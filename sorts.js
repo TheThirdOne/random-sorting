@@ -144,20 +144,20 @@ function quickInsertSortRecurse(arr,comp,lo,hi){
     }
 }
 function heapSort(arr,comp){
-  heapSortCustom(arr,comp,start,end);
+  heapSortCustom(arr,comp,0,arr.length);
 }
 
 function heapSortCustom(arr, comp,start,end){
   heapify(arr, comp, start, end);
-  for(var i = arr.length-1; i > 0;i--){
+  for(var i = end-1; i > start;i--){
     let t = arr[i];
-    arr[i] = arr[0];
-    arr[0] = t;
-    siftDown(arr, comp, 0, start, i-1)
+    arr[i] = arr[start];
+    arr[start] = t;
+    siftDown(arr, comp, start, start, i-1)
   }
 }
 function heapify(arr, comp,start,end){
-  for(var i = Math.floor(((end-1)+start-1)/2); i >= 0; i--){
+  for(var i = Math.floor(((end-1)+start-1)/2); i >= start; i--){
     siftDown(arr, comp, i, start, end - 1);
   }
 }
