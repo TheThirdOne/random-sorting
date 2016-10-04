@@ -52,7 +52,7 @@ function shellSort(arr,comp){
 //insertion sort with custom increment, initial position and end position
 function insertCustom(arr,comp,start,increment,end){
   for(var i = start+increment; i < end; i+=increment){
-    for(var k = i; k - increment >= 0; k -= increment){
+    for(var k = i; k - increment >= start; k -= increment){
       if(comp(arr[k-increment],arr[k]) > 0){
         let temp = arr[k];
         arr[k]   = arr[k-increment];
@@ -94,16 +94,16 @@ function partition(arr,comp,lo,hi){
 }
 
 function mergeSort(arr,comp){
-  return mergeSortRecurse(arr,comp,0,arr.length-1,0);
+  return mergeSortRecurse(arr,comp,0,arr.length-1);
 }
 
-function mergeSortRecurse(arr,comp,start,end,l){
+function mergeSortRecurse(arr,comp,start,end){
   if(start >= end){
     return;
   }
   var a = Math.floor(end/2+start/2);
-  mergeSortRecurse(arr,comp,start,a,l+1);
-  mergeSortRecurse(arr,comp,a+1,end,l+1);
+  mergeSortRecurse(arr,comp,start,a);
+  mergeSortRecurse(arr,comp,a+1,end);
 
   // merge
   var tmp = arr.slice(start,a+1); // move first elements out of the way for the merge.
@@ -127,6 +127,54 @@ function mergeSortRecurse(arr,comp,start,end,l){
   }
 }
 
+function mergeSortLoop(arr,comp){
+  var a1 = arr;
+  var a2 = new Array(arr.length)
+  for(var w = 3; w < arr.length; w *= 2){
+    for(var lo = 0; lo < arr.length; lo += 2*w){
+      var hi = lo + w;
+      if (hi >= arr.length) {
+          copy(a2, a1, lo, arr.length-1);
+          break;
+      }
+      var top = Math.min(lo + 2*w,arr.length);
+      merge(a2, a1, lo, hi, top-1, comp);
+    }
+    var s = a1;
+    a1 = a2;
+    a2 = s;
+  }
+  if(a1 !== arr){
+    copy(arr,a1,0,arr.length-1);
+  }
+}
+
+function merge(a1,a2,lo,hi,top,comp){
+  var j = hi;
+  for(var i = lo; i <= top; i++){
+    if(lo >= hi){                  // if the first subarray is empty
+      a1[i] = a2[j];
+      j++;
+    }else if(j > top){            // if the second subarray is empty
+      a1[i] = a2[lo];
+      lo++;
+    }else{
+      if(comp(a2[lo],a2[j])>0){  // otherwise compare and move the smaller one
+        a1[i] = a2[j];
+        j++;
+      }else{
+        a1[i] = a2[lo];
+        lo++;
+      }
+    }
+  }
+}
+
+function copy(a1,a2,lo,hi){
+  for(var i = lo; i <= hi; i++){
+    a1[i] = a2[i];
+  }
+}
 
 function quickInsertSort(arr,comp){
   return quickInsertSortRecurse(arr,comp,0,arr.length-1);
@@ -147,7 +195,7 @@ function heapSort(arr,comp){
   heapSortCustom(arr,comp,0,arr.length);
 }
 
-function heapSortCustom(arr, comp,start,end){
+function heapSortCustom(arr,comp,start,end){
   heapify(arr, comp, start, end);
   for(var i = end-1; i > start;i--){
     let t = arr[i];
