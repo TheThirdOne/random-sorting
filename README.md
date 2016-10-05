@@ -89,6 +89,7 @@ not change any results as the javascript sorts should perform the same.
 |Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
 |Firefox|![FArray.sort-10](images/FArray.sort-10.png)|![FArray.sort-30](images/FArray.sort-30.png)|![FArray.sort-50](images/FArray.sort-50.png)|![FArray.sort-100](images/FArray.sort-100.png)|![Array.sort-300](images/FArray.sort-300.png)|
 
+Note: Varying array lengths (n) are used shown because some of the features of the graph may be clearer at a lower resolution. Also for Chrome `n=10` vs `n=30` are very different graphs.
 
 Based simply on these histograms, can you guess which algorithm Chrome is using?
 If you can, that is very impressive; if you can't, it should become more clear
@@ -231,32 +232,213 @@ we can start to expect to see some similarities to the implementations of Array.
 ### Heap Sort
 
 If you are unfamiliar with [Heap Sort](https://en.wikipedia.org/wiki/Heap_sort),
-the TLDR _TLDR_.
+the TLDR is that the array is manipulated into a [heap](https://en.wikipedia.org/wiki/Heap_(data_structure))
+(generally [in place](https://en.wikipedia.org/wiki/In-place_algorithm) as a
+[binary tree](https://en.wikipedia.org/wiki/Binary_tree)). Then the maximum element
+is taken out and moved to the end of the unsorted array and the heap is reorganized
+to be a heap again.
 
 The implementation I made was as follows:
 
 ```
+function heapSort(arr,comp){
+  heapSortCustom(arr,comp,0,arr.length);
+}
 
+function heapSortCustom(arr,comp,start,end){
+  heapify(arr, comp, start, end);               // Rearrange Array into a Heap
+  for(var i = end-1; i > start;i--){
+    let t = arr[i];                             // Move First element to the end
+    arr[i] = arr[start];
+    arr[start] = t;
+    siftDown(arr, comp, start, start, i-1)      // Re-satisfy the heap property
+  }
+}
+function heapify(arr, comp,start,end){
+  for(var i = Math.floor(((end-1)+start-1)/2); i >= start; i--){
+    siftDown(arr, comp, i, start, end - 1);
+  }
+}
+function siftDown(arr, comp, root, start, end){
+  while(2*root + 1 - start <= end){
+    let child = 2*root+1-start;
+    let tmp = root;
+
+    if(comp(arr[child],arr[tmp])>0){
+      tmp = child;
+    }
+    if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
+      tmp = child + 1;
+    }
+    if(tmp  == root){
+      return;
+    }else{
+      let t = arr[root];
+      arr[root] = arr[tmp];
+      arr[tmp] = t;
+      root = tmp;
+    }
+  }
+}
 ```
+
+This is certainly the most complex graph we have seen so far and it is much harder
+to analyse as a result.
+
+One way we can get a better understanding of it is by separating it into the `heapify`
+part and the for loop part.
+
+|    Heapify    |    Loop    |
+|---------------|------------|
+|![Heapify](images/heapify-300.png)|![Heap Loop](images/heap-loop-300.png)|
+
+From this it is quite clear that `heapify` is the cause of the multiple lines and
+the loop fills in the graph. But how do we know that the Loop image is an accurate
+representation of what Heap Sort is doing; the setup to it is commented out so how
+can its graph be valid on its own.
+
+We can answer that concern be trying to reassemble the original heap sort from the
+peices. We simply need to find out how to compose one graph on top of another.
+
+This "compose" operation can just be thought of as a matrix multiplication. The
+exact reason why "compose" is a matrix multiplication is not very important or interesting
+so it will be left as an exercise for the reader.
+
+As javascript does not have a matrix multiplication built in and I don't want to
+bring in a library. I implemented it as:
+```
+function compose(f,g){
+  var n = f.length;
+  var out = (new Array(n)).fill(0).map(()=>new Array(n).fill(0));
+  for(var x = 0; x < n; x++){
+    let h = f[x];
+    for(var y = 0; y < n; y++){
+      let i = g[y];
+      for(var k = 0; k < n;k++){ //rescale i by h[y] and add to out[x]
+        out[x][k] += h[y]*i[k];
+      }
+    }
+  }
+  return out;
+}
+```
+
+Using this on the heapified graph and loop graph we find that it is statistically
+indistinguishable from the normal Heap Sort graph.
+
+|    Compose(Heapify,Loop)   |    Heap Sort    |
+|----------------------------|-----------------|
+|![Composed Heap Sort](images/composed-heap-300.png)|![Heap Sort](images/heap-300.png)|
+
+_Analysis of Heapify_
+
+_Analysis of the Loop_
+
 
 ### Merge Sort
 
 If you are unfamiliar with [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort),
-the TLDR _TLDR_.
+the TLDR is that it merges (sorted) subarrays until it has merged the entire array.
 
-The implementation I made was as follows:
+There are two main ways of implementing merge sort: bottom-up and top-down. Originally
+I had implemented it top-down (because its slightly easier that way), but implemented
+it bottom-up to use the compose analysis on it (it is easier to separate analysis
+with loops and because it is slightly more efficient, the browsers were more likely
+to implement it this way).
+
+My bottom-up implementation I made was as follows:
 
 ```
+function mergeSort(arr,comp){
+  var a1 = arr;
+  var a2 = new Array(arr.length)
+  for(var w = 3; w < arr.length; w *= 2){
+    for(var lo = 0; lo < arr.length; lo += 2*w){
+      var hi = lo + w;
+      if (hi >= arr.length) {
+          copy(a2, a1, lo, arr.length-1);
+          break;
+      }
+      var top = Math.min(lo + 2*w,arr.length);
+      merge(a2, a1, lo, hi, top-1, comp);
+    }
+    var s = a1;
+    a1 = a2;
+    a2 = s;
+  }
+  if(a1 !== arr){
+    copy(arr,a1,0,arr.length-1);
+  }
+}
 
+function merge(a1,a2,lo,hi,top,comp){
+  var j = hi;
+  for(var i = lo; i <= top; i++){
+    if(lo >= hi){                  // if the first subarray is empty
+      a1[i] = a2[j];
+      j++;
+    }else if(j > top){            // if the second subarray is empty
+      a1[i] = a2[lo];
+      lo++;
+    }else{
+      if(comp(a2[lo],a2[j])>0){  // otherwise compare and move the smaller one
+        a1[i] = a2[j];
+        j++;
+      }else{
+        a1[i] = a2[lo];
+        lo++;
+      }
+    }
+  }
+}
+
+function copy(a1,a2,lo,hi){
+  for(var i = lo; i <= hi; i++){
+    a1[i] = a2[i];
+  }
+}
 ```
+
+_Full analysis of MergeSort_
 
 ### Quick Sort
 
 If you are unfamiliar with [Quick Sort](https://en.wikipedia.org/wiki/Quick_sort),
-the TLDR _TLDR_.
+the TLDR is that it picks a pivot value (this is the largest differenece between
+different quicksort implementations) and moves all smaller elments to the left of
+it and all larger ones to the right then recurses on those two smaller arrays.
 
 The implementation I made was as follows:
 
 ```
+function quickSort(arr,comp){
+  return quickSortRecurse(arr,comp,0,arr.length-1);
+}
 
+//quicksort on a slice of the array
+function quickSortRecurse(arr,comp,lo,hi){
+  if(lo < hi){
+    let pivot = partition(arr,comp,lo,hi);
+    quickSortRecurse(arr,comp,lo,pivot-1);
+    quickSortRecurse(arr,comp,pivot+1,hi);
+  }
+}
+
+// poor partitioning algorithm for real sorting, I expect the browsers are doing something better/harder
+function partition(arr,comp,lo,hi){
+  var pivot = arr[hi];
+  var k = lo;
+  for(var i = lo; i < hi;i++){
+    if(comp(arr[i],pivot) < 0){
+      let temp = arr[i];
+      arr[i]   = arr[k];
+      arr[k]   = temp;
+      k++;
+    }
+  }
+  arr[hi] = arr[k];
+  arr[k]  = pivot;
+  return k;
+}
 ```
+_Analysis of Quick Sort_
