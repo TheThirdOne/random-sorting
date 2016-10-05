@@ -37,11 +37,11 @@ positions in the array vs final positions in the array.
 
 For example, a histogram of an algorithm that does nothing looks like:
 
-![Forward](link to image)
+![Forward](images/forward.png)
 
 And for a algorithm that reverses the array would look like:
 
-![Backward](link to image)
+![Backward](images/backward.png)
 
 We can then write a function to run a random sort n times as follows:
 
