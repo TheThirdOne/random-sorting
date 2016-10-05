@@ -49,8 +49,6 @@ function computeHist2(hist){
 }
 var sum = (a)=>a.reduce((a,b)=>a+b,0);
 
-
-
 function display(hist){
   var c = document.createElement('canvas');
   c.width = 300;
@@ -92,4 +90,20 @@ function max(init,arr){
   }else{
     return Math.max(init,arr);
   }
+}
+
+//essentially just a matrix multiplication assuming nxn * nxn
+function compose(f,g){
+  var n = f.length;
+  var out = (new Array(n)).fill(0).map(()=>new Array(n).fill(0));
+  for(var x = 0; x < n; x++){
+    let h = f[x];
+    for(var y = 0; y < n; y++){
+      let i = g[y];
+      for(var k = 0; k < n;k++){ //rescale i by h[y] and add to out[x]
+        out[x][k] += h[y]*i[k];
+      }
+    }
+  }
+  return out;
 }
