@@ -570,12 +570,15 @@ Which is not right, its kindof closer than a pure merge sort. _Once I generate g
 I can't infer from the graphs what the difference in our implementations is. So
 I am going to cheat a little and look at the source code of spider monkey.
 
-Surprisingly, it is quite easy to find the sorting code. Just look at _~Array.cpp~_
-and see that mergeSort is called, but not defined in the file so it must be in one
-of the headers. `ds/Sort.h` seems quite promising. In there we find the definition
-of MergeSort and all helper methods.
+Surprisingly, it is quite easy to find the sorting code by looking through the 
+[source](https://github.com/mozilla/gecko-dev/) on github. Just look at 
+[jsarray.cpp](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp)
+(The obvious place to look for Array methods) and see that [MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L1753)
+is called, but not defined in the file so it must be in one of the headers. [ds/Sort.h](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L28)
+seems quite promising. In there we find the [definition of MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L82)
+and some [helper methods](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L18).
 
-And looking through, our implementation is strikingly similar to Spidemonkey's.
+And looking through, our implementation is strikingly similar to Spidemonkey's (this _may_ not be purely conicidental).
 It may be hard to see how the graphs are so different, when the implementations
 are so similar.
 
