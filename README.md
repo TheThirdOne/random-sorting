@@ -570,8 +570,8 @@ Which is not right, its kindof closer than a pure merge sort. _Once I generate g
 I can't infer from the graphs what the difference in our implementations is. So
 I am going to cheat a little and look at the source code of spider monkey.
 
-Surprisingly, it is quite easy to find the sorting code by looking through the 
-[source](https://github.com/mozilla/gecko-dev/) on github. Just look at 
+Surprisingly, it is quite easy to find the sorting code by looking through the
+[source](https://github.com/mozilla/gecko-dev/) on github. Just look at
 [jsarray.cpp](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp)
 (The obvious place to look for Array methods) and see that [MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L1753)
 is called, but not defined in the file so it must be in one of the headers. [ds/Sort.h](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L28)
@@ -625,10 +625,10 @@ For `n=10` we can see that it is very similar if not indentical to insertion Sor
 
 A quick test can show a comparison of Array.sort and insertion Sort around 10.
 
-|   n   |     5     |     10     |     12     |     15     |     20     |
-|-------|-----------|------------|------------|------------|------------|
-|Chrome |![Array.sort-5](images/Array.sort-5.png)|![Array.sort-10](images/Array.sort-10.png)|![Array.sort-12](images/Array.sort-12.png)|![Array.sort-15](images/Array.sort-15.png)|![Array.sort-20](images/Array.sort-20.png)|
-|Insertion|![insertion-5](images/insertion-5.png)|![insertion-10](images/insertion-10.png)|![insertion-12](images/insertion-12.png)|![insertion-15](images/insertion-15.png)|![insertion-20](images/insertion-20.png)|
+|   n   |     5     |     10     |     12     |     15     |
+|-------|-----------|------------|------------|------------|
+|Chrome |![Array.sort-5](images/Array.sort-5.png)|![Array.sort-10](images/Array.sort-10.png)|![Array.sort-12](images/Array.sort-12.png)|![Array.sort-15](images/Array.sort-15.png)|
+|Insertion|![insertion-5](images/insertion-5.png)|![insertion-10](images/insertion-10.png)|![insertion-12](images/insertion-12.png)|![insertion-15](images/insertion-15.png)|
 
 As we can see, _what we can tell_.
 

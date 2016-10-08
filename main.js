@@ -16,9 +16,11 @@ function download(url,name){
 }
 
 function generate(disp,triples){
-  triples.map(function(triple){
-    disp(graph(hist(triple[0],triple[1])));
+  return triples.map(function(triple){
+    var h = hist(triple[0],triple[1]);
+    disp(graph(h),triple[2]);
     console.log("Completed ", triple[2], " at resolution ", triple[0]);
+    return [triple[0],h,triple[2]];
   });
 }
 
@@ -39,20 +41,20 @@ function heapLoop(arr,comp){
 // Insert Merge pieces
 function boundedInsert(arr,comp){
   for(var i = 0; i < arr.length;i++){
-    insertCustom(arr,comp,i,1,Math.max(i+3));
+    insertCustom(arr,comp,i,1,Math.min(arr.length,i+3));
   }
 }
 
 
-var tests = [ [10,()=>0,'forward'], [10,(a)=>a.reverse(),'backward'],                                          // Introduction
+var tests = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],                                      // Introduction
   ...standard(bubbleSort,'bubble'),...standard(insertionSort,'insert'),...standard(selectionSort,'selection'), // Simple algorithms
   ...standard(heapSort, 'heap'),   ...standard(mergeSort,    'merge'), ...standard(quickSort,    'quick'),     // Effecient algorithms
   [300, (a,c)=>heapify(a,c,0,a.length), 'heapify-300'], [300, heapLoop, 'heap-loop-300'],                      // Heap Analysis
   [10, boundedInsert, 'bounded-insert-10'],                                                                    // Firefox Array.sort Analysis
   
   // Chrome Array.sort Analysis
-  [5, insertionSort,    'insert-5'],    [12, insertionSort,    'insert-12'],    [15, insertionSort,    'insert-15'],    [20, insertionSort,    'insert-20'],
-  [5, (a,b)=>a.sort(b), 'Array.sort-5'],[12, (a,b)=>a.sort(b), 'Array.sort-12'],[15, (a,b)=>a.sort(b), 'Array.sort-15'],[20, (a,b)=>a.sort(b), 'Array.sort-20'],
+  [5, insertionSort,    'insert-5'],    [12, insertionSort,    'insert-12'],    [15, insertionSort,    'insert-15'],
+  [5, (a,b)=>a.sort(b), 'Array.sort-5'],[12, (a,b)=>a.sort(b), 'Array.sort-12'],[15, (a,b)=>a.sort(b), 'Array.sort-15'],
 ]
 
 //TODO: compose(heapify,heaploop)
