@@ -1,109 +1,65 @@
-function hist(n,sort){
-  var h = (new Array(n).fill(0)).map(()=>(new Array(n)).fill(0));
-  var arr = (new Array(n)).fill(0);
-  for(var i = 0; i < 100000; i++){
-    arr = arr.map((a,b)=>b); //convert to ascending array
-    sort(arr,()=>Math.floor(Math.random()*3-1))
-    for(var k = 0; k < n;k++){
-      h[arr[k]][k]++;
-    }
-  }
-  return h;
+// Displays a url by appending a img tag to body
+// Uses Data urls here
+function show(url){
+  var img = document.createElement('img');
+  img.src = url;
+  document.body.appendChild(img);
 }
-function bounds(hist2){
-  var total = 0, s = sum(hist2);
-  var a, b;
-  for(var i = 0; i < hist2.length;i++){
-    total += hist2[i];
-    if(total > s/100){
-      a = i-1;
-      break;
-    }
-  }
-  total = 0;
-  for(var i = hist2.length-1; i >= 0;i--){
-    total += hist2[i];
-    if(total > s/100){
-      b = i+1;
-      break;
-    }
-  }
-  return [a,b];
+
+// Downloads URL as PNG
+// Note: Doesn't seem to work in FireFox
+function download(url,name){
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = name + ".png";
+  a.click();
 }
-function computeHist2(hist){
-  var m = max(0,hist);
+
+function generate(disp,triples){
+  triples.map(function(triple){
+    disp(graph(hist(triple[0],triple[1])));
+    console.log("Completed ", triple[2], " at resolution ", triple[0]);
+  });
+}
+
+function standard(func,name){
+  return [10,30,50,100,300].map((a)=>[a,func,name+'-'+a]);
+}
+
+// Heap Sort Analysis pieces
+function heapLoop(arr,comp){
+  for(var i = arr.length-1; i > 0;i--){
+    let t = arr[i];
+    arr[i] = arr[0];
+    arr[0] = t;
+    siftDown(arr, comp, 0, 0, i-1)
+  }
+}
+
+// Insert Merge pieces
+function boundedInsert(arr,comp){
+  for(var i = 0; i < arr.length;i++){
+    insertCustom(arr,comp,i,1,Math.max(i+3));
+  }
+}
+
+
+var tests = [ [10,()=>0,'forward'], [10,(a)=>a.reverse(),'backward'],                                          // Introduction
+  ...standard(bubbleSort,'bubble'),...standard(insertionSort,'insert'),...standard(selectionSort,'selection'), // Simple algorithms
+  ...standard(heapSort, 'heap'),   ...standard(mergeSort,    'merge'), ...standard(quickSort,    'quick'),     // Effecient algorithms
+  [300, (a,c)=>heapify(a,c,0,a.length), 'heapify-300'], [300, heapLoop, 'heap-loop-300'],                      // Heap Analysis
+  [10, boundedInsert, 'bounded-insert-10'],                                                                    // Firefox Array.sort Analysis
   
-  var hist2 = new Array(1200).fill(0);
-  for(var i = 0; i < hist.length; i++){
-    for(var k = 0; k < hist[0].length;k++){
-      let hue = Math.floor(1200*Math.sqrt(hist[i][k])/Math.sqrt(m));
+  // Chrome Array.sort Analysis
+  [5, insertionSort,    'insert-5'],    [12, insertionSort,    'insert-12'],    [15, insertionSort,    'insert-15'],    [20, insertionSort,    'insert-20'],
+  [5, (a,b)=>a.sort(b), 'Array.sort-5'],[12, (a,b)=>a.sort(b), 'Array.sort-12'],[15, (a,b)=>a.sort(b), 'Array.sort-15'],[20, (a,b)=>a.sort(b), 'Array.sort-20'],
+]
 
-      if(hue >= 1199){
-        hue = 1199;
-      }
+//TODO: compose(heapify,heaploop)
 
-      hist2[hue]++;
-    }
-  }
-  return hist2;
-}
-var sum = (a)=>a.reduce((a,b)=>a+b,0);
 
-function display(hist){
-  var c = document.createElement('canvas');
-  c.width = 300;
-  c.height = 400;
-  var ctx = c.getContext('2d');
-  var m = max(0,hist);
-  var a = 300/hist.length, b = 300/hist[0].length;
-  
 
-  
-  var hist2 = computeHist2(hist);           //computes histogram of pixels hues vs count
-  var [lower,upper] = bounds(hist2);        //computes bounds such that 98% of pixels don't get clipped
-  var hist3 = new Array(300).fill(0);
-  for(var i = 0; i < hist.length; i++){
-    for(var k = 0; k < hist[0].length;k++){
-      let hue = 1200*Math.sqrt(hist[i][k])/Math.sqrt(m);
 
-      hue = Math.floor(300/(upper-lower)*(hue - lower));//rescale so the lower bound = 0 and upper bound = 300 and sample with dx=1
-      hue = Math.min(Math.max(hue,0),299);  //clamp to 0-299
 
-      hist3[hue]++;
 
-      ctx.fillStyle = 'hsl(' + hue + ',100%,50%)';
-      ctx.fillRect(i*a,k*b,a,b);
-    }
-  }
-  
-  m = max(0,hist3);
-  for(var i = 0; i < 360; i++){
-    ctx.fillStyle = 'hsl(' + i + ',100%,50%)'
-    ctx.fillRect(i,400-Math.floor(100*hist3[i]/m),1,Math.floor(100*hist3[i]/m));
-  }
-  return c.toDataURL();
-}
 
-function max(init,arr){
-  if(Array.isArray(arr)){
-    return arr.reduce(max,init);
-  }else{
-    return Math.max(init,arr);
-  }
-}
-
-//essentially just a matrix multiplication assuming nxn * nxn
-function compose(f,g){
-  var n = f.length;
-  var out = (new Array(n)).fill(0).map(()=>new Array(n).fill(0));
-  for(var x = 0; x < n; x++){
-    let h = f[x];
-    for(var y = 0; y < n; y++){
-      let i = g[y];
-      for(var k = 0; k < n;k++){ //rescale i by h[y] and add to out[x]
-        out[x][k] += h[y]*i[k];
-      }
-    }
-  }
-  return out;
-}
