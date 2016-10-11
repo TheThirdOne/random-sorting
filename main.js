@@ -39,18 +39,19 @@ function heapLoop(arr,comp){
 }
 
 // Insert Merge pieces
-function boundedInsert(arr,comp){
-  for(var i = 0; i < arr.length;i++){
-    insertCustom(arr,comp,i,1,Math.min(arr.length,i+3));
-  }
-}
+
 
 
 var tests = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],                                         // Introduction
   ...standard(bubbleSort,'bubble'),...standard(insertionSort,'insertion'),...standard(selectionSort,'selection'), // Simple algorithms
   ...standard(heapSort, 'heap'),   ...standard(mergeSort,    'merge'), ...standard(quickSort,    'quick'),        // Effecient algorithms
   [300, (a,c)=>heapify(a,c,0,a.length), 'heapify-300'], [300, heapLoop, 'heap-loop-300'],                         // Heap Analysis
-  [10, boundedInsert, 'bounded-insert-10'],                                                                       // Firefox Array.sort Analysis
+  
+  // Firefox Array.sort Analysis
+  [10, boundedInsertionSort, 'bounded-insertion-10'],
+  ...standard(mergeInsertSort, 'merge-insert'),
+  
+  
   
   // Chrome Array.sort Analysis
   [5, insertionSort,    'insertion-5'],    [12, insertionSort,    'insertion-12'],    [15, insertionSort,    'insertion-15'],

@@ -88,7 +88,7 @@ function siftDown(arr, comp, root, start, end){
 function mergeSort(arr,comp){
   var a1 = arr;
   var a2 = new Array(arr.length)
-  for(var w = 3; w < arr.length; w *= 2){
+  for(var w = 1; w < arr.length; w *= 2){
     for(var lo = 0; lo < arr.length; lo += 2*w){
       var hi = lo + w;
       if (hi >= arr.length) {
@@ -181,8 +181,84 @@ function quickInsertSortRecurse(arr,comp,lo,hi){
 }
 
 
+// FireFox analysis
+
+// Runs Insertion sort on 3 wide sub arrays along the entire array
+function boundedInsertionSort(arr,comp){
+  for(var i = 0; i < arr.length; i+=3){
+    insertCustom(arr,comp,i,1,Math.min(arr.length,i+3));
+  }
+}
+
+// insertion sort with custom increment, initial position and end position
+// used for shell sort, merge-insert sort and quick-insert sort
+function insertCustom(arr,comp,start,increment,end){
+  for(var i = start+increment; i < end; i+=increment){
+    for(var k = i; k - increment >= start; k -= increment){
+      if(comp(arr[k-increment],arr[k]) > 0){
+        let temp = arr[k];
+        arr[k]   = arr[k-increment];
+        arr[k-increment] = temp;
+      }else{
+        break;
+      }
+    }
+  }
+}
+
+// First guess at what Firefox is doing.
+function mergeInsertSort(arr,comp){
+  boundedInsertionSort(arr,comp);
+  var a1 = arr;
+  var a2 = new Array(arr.length)
+  for(var w = 3; w < arr.length; w *= 2){
+    for(var lo = 0; lo < arr.length; lo += 2*w){
+      var hi = lo + w;
+      if (hi >= arr.length) {
+          copy(a2, a1, lo, arr.length-1);
+          break;
+      }
+      var top = Math.min(lo + 2*w,arr.length);
+      merge(a2, a1, lo, hi, top-1, comp);
+    }
+    var s = a1;
+    a1 = a2;
+    a2 = s;
+  }
+  if(a1 !== arr){
+    copy(arr,a1,0,arr.length-1);
+  }
+}
 
 // Todo: include sub-sorts used in analysis
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -195,22 +271,6 @@ function shellSort(arr,comp){
   for(; h > 0; h = Math.floor(h / 3)){
     for(var i = 0; i < h; i ++){
       insertCustom(arr,comp,i,h,arr.length);
-    }
-  }
-}
-
-//insertion sort with custom increment, initial position and end position
-// used for shell sort, MergeInsert and quickinsert
-function insertCustom(arr,comp,start,increment,end){
-  for(var i = start+increment; i < end; i+=increment){
-    for(var k = i; k - increment >= start; k -= increment){
-      if(comp(arr[k-increment],arr[k]) > 0){
-        let temp = arr[k];
-        arr[k]   = arr[k-increment];
-        arr[k-increment] = temp;
-      }else{
-        break;
-      }
     }
   }
 }
