@@ -548,11 +548,14 @@ function mergeInsertSort(arr,comp){
 ```
 
 Which looks like:
+
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
-|Insert-Merge|![insert-merge-10](images/insert-merge-10.png)|![insert-merge-30](images/insert-merge-30.png)|![insert-merge-50](images/insert-merge-50.png)|![insert-merge-100](images/insert-merge-100.png)|![insert-merge-300](images/insert-merge-300.png)|
+|Merge Insert|![merge-insert-10](images/merge-insert-10.png)|![merge-insert-30](images/merge-insert-30.png)|![merge-insert-50](images/merge-insert-50.png)|![merge-insert-100](images/merge-insert-100.png)|![merge-insert-300](images/merge-insert-300.png)|
 
-Which is not right, its kindof closer than a pure merge sort. _Once I generate graphs, more here_
+Which is not right, it is still really close to the default merge sort. We need
+something to make merge sort more chunky and let the insertion sort shine through
+more.
 
 I can't infer from the graphs what the difference in our implementations is. So
 I am going to cheat a little and look at the source code of spider monkey.
@@ -565,17 +568,62 @@ is called, but not defined in the file so it must be in one of the headers. [ds/
 seems quite promising. In there we find the [definition of MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L82)
 and some [helper methods](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L18).
 
+Note: if you don't really care not looking at the source code won't affect anything; it is very similar to the code here.
+
 And looking through, our implementation is strikingly similar to Spidemonkey's (this _may_ not be purely conicidental).
 It may be hard to see how the graphs are so different, when the implementations
 are so similar.
 
-The one missing thing is this check:
+The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L41):
+
+Note this check simply allows it to be slightly faster than the naive implementation, it does not affect correctness (assuming that the comparator is transitive ie ((a > b), (b > c) -> (a > c)))or Big O runtime.
 ```
-//code from Sort.h
+if (!lessOrEqual) {
+        /* Runs are not already sorted, merge them. */
 ```
 
-_Further Analysis_
 
+Implementing that check in merge would lead to:
+
+```
+function mergeOpt(a1,a2,lo,hi,top,comp){
+  var j = hi;
+  if(comp(a2[lo],a2[j])>0){
+    for(var i = lo; i <= top; i++){
+      if(lo >= hi){
+        a1[i] = a2[j];
+        j++;
+      }else if(j > top){
+        a1[i] = a2[lo];
+        lo++;
+      }else{
+        if(comp(a2[lo],a2[j])>0){
+          a1[i] = a2[j];
+          j++;
+        }else{
+          a1[i] = a2[lo];
+          lo++;
+        }
+      }
+    }
+  }else{
+    copy(a1,a2,lo,top); //not copy(a1,a2,lo,hi) because that would only copy the first sub array
+  }
+}
+```
+
+And when we run the Merge Insert Sort with this extra check,
+
+|   n   |     10     |     30     |     50     |     100     |     300     |
+|-------|------------|------------|------------|-------------|-------------|
+|Merge Insert with Extra Check|![merge-insert-opt-10](images/merge-insert-opt-10.png)|![merge-insert-opt-30](images/merge-insert-opt-30.png)|![merge-insert-opt-50](images/merge-insert-opt-50.png)|![merge-insert-opt-100](images/merge-insert-opt-100.png)|![merge-insert-opt-300](images/merge-insert-opt-300.png)|
+
+Which is nearly identical. Success!
+
+And we only had to cheat a little. We were able to guess most of the implementation
+through this type of analysis, but it wasn't immediately clear how to implement
+the last major difference. We could at least confirm if our implementation was nearly
+identical though.
 
 ### Chrome's implementation
 

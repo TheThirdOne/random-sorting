@@ -50,6 +50,7 @@ var tests = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],       
   // Firefox Array.sort Analysis
   [10, boundedInsertionSort, 'bounded-insertion-10'],
   ...standard(mergeInsertSort, 'merge-insert'),
+  ...standard(mergeInsertSortOpt, 'merge-insert-opt'),
   
   
   

@@ -230,6 +230,57 @@ function mergeInsertSort(arr,comp){
   }
 }
 
+// Second guess after cheating a bit
+function mergeInsertSortOpt(arr,comp){
+  boundedInsertionSort(arr,comp);
+  var a1 = arr;
+  var a2 = new Array(arr.length)
+  for(var w = 3; w < arr.length; w *= 2){
+    for(var lo = 0; lo < arr.length; lo += 2*w){
+      var hi = lo + w;
+      if (hi >= arr.length) {
+          copy(a2, a1, lo, arr.length-1);
+          break;
+      }
+      var top = Math.min(lo + 2*w,arr.length);
+      mergeOpt(a2, a1, lo, hi, top-1, comp);
+    }
+    var s = a1;
+    a1 = a2;
+    a2 = s;
+  }
+  if(a1 !== arr){
+    copy(arr,a1,0,arr.length-1);
+  }
+}
+
+// Merge with a small optimization
+function mergeOpt(a1,a2,lo,hi,top,comp){
+  var j = hi;
+  if(comp(a2[lo],a2[j])>0){
+    for(var i = lo; i <= top; i++){
+      if(lo >= hi){
+        a1[i] = a2[j];
+        j++;
+      }else if(j > top){
+        a1[i] = a2[lo];
+        lo++;
+      }else{
+        if(comp(a2[lo],a2[j])>0){
+          a1[i] = a2[j];
+          j++;
+        }else{
+          a1[i] = a2[lo];
+          lo++;
+        }
+      }
+    }
+  }else{
+    copy(a1,a2,lo,top); //not copy(a1,a2,lo,hi) because that would only copy the first sub array
+  }
+}
+
+
 // Todo: include sub-sorts used in analysis
 
 
