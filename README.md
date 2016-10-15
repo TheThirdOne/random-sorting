@@ -306,6 +306,7 @@ so it will be left as an exercise for the reader.
 
 As javascript does not have a matrix multiplication built in and I don't want to
 bring in a library. I implemented it as:
+
 ```
 function compose(f,g){
   var n = f.length;
@@ -459,7 +460,8 @@ _Analysis of Quick Sort_
 
 While it is less clear that Chrome's implementation involves a quicksort, there
 is definitely a evenness that is not apparrent in any other major sort, so Chrome
-must be using quicksort somehow.
+must be using quicksort somehow. If you are unconvinced, don't worry I will have
+a more convinving argument as to why Chrome must be using Quick Sort later.
 
 ## Figuring out the implementations of Array.Sort
 
@@ -503,7 +505,9 @@ function insertCustom(arr,comp,start,increment,end){
 }
 ```
 
-Which looks like ![Bounded Insertion](images/bounded-insertion-10.png)
+Which looks like
+
+![Bounded Insertion](images/bounded-insertion-10.png)
 
 Why would Firefox be using insertion sort like this? Merge Sort can sort just fine
 on its own.
@@ -634,8 +638,9 @@ Reminder of the Graphs
 |Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
 
 #### Verification that QuickSort is involved
+
 One thing that may have seemed specualtive in earlier analysis is that chrome has
-to somehow use QuickSort.
+to somehow use Quick Sort.
 
 We can at least somewhat confirm this by showing that Chrome's Array.sort in [unstable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).
 
@@ -665,13 +670,17 @@ A quick test can show a comparison of Array.sort and insertion Sort around 10.
 |Chrome |![Array.sort-5](images/Array.sort-5.png)|![Array.sort-10](images/Array.sort-10.png)|![Array.sort-12](images/Array.sort-12.png)|![Array.sort-15](images/Array.sort-15.png)|
 |Insertion|![insertion-5](images/insertion-5.png)|![insertion-10](images/insertion-10.png)|![insertion-12](images/insertion-12.png)|![insertion-15](images/insertion-15.png)|
 
-As we can see, _what we can tell_.
+As we can see, for `n=5` and `n=10`, Array.sort looks indistinguishable from insertion
+sort. But for `n=12` and `n=15`, the patterns diverge. We can conclude from this that,
+at least for first iteration (my guess is that its true for every iteration), if
+`n <= 10`, insertion sort is being used instead of Quick Sort.
 
 #### Partitioning algorithm
 
 In the graphs of Array.sort, the first, middle and last elements all have a vertical line associated with them in the graph. So we can guess that the pivot value is chosen somehow from one of those three elements.
 
 IE, the partition function is probably something like
+
 ```
 function partition(arr,comp,lo,hi){
   // f is some unknown function
@@ -727,8 +736,31 @@ _Here is how we did well / messed up_
 
 ## Final Words
 
-_Conclusion_
+By using a random compartor we were able to see into the black box of Array.sort
+implementation and do a decent job of reverse engineering. This technique has many
+parallels to [Fuzz Testing](https://en.wikipedia.org/wiki/Fuzz_testing); the main
+diferrence is that we are not trying to make the software error and instead are
+seeing what the undefined behaviour looks like. By comparing to known algorithms,
+we can get most of the way to understanding what is happening inside the black box.
+Getting to an exact match of the implementation may be hard to do, but if achieved
+through some separate method. This method can validate much of the behaviour of the
+reproduced algorithm.
 
+Hints for applying this type of technique to other types of problems:
+  - Find undefined behaviour that would differentiate algorithms
+    - All sorting algorithms give the same final result (disragarding stability) if the compartor fufills a few comnditions (reflexive, antisymmtric, transitive)
+    - Randomness abuses all three and thus the output is undefined
+  - Find a way to visualize or aggregate the data
+  - Implement several algorithms and test them to understand patterns
+  -
+### Next Steps
+
+Some possible ways to build off this:
+  - Try using a different random comparator eg make it change the probabilities of 1 -1 and 0
+  - Try testing other sort implementations such as Opera's and Edge/IE's
+    - A PR for this would be welcomed
+  - Try having the comparator only sometimes be random
+  
 
 ## Appendix: More Hybrid Sorts
 Here are a few more sorts I implemented, but didn't fit well into the flow of the
