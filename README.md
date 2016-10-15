@@ -719,14 +719,100 @@ function f(arr,lo,mid,hi){
 
 #### Best guess for Chrome's implementation
 
-Combining all of the hints we have extracted thus far, we can get that chrome's implementation is something like:
+Combining all of the hints we have extracted thus far, we can get that chrome's
+implementation is something like:
 
 ```
-// quickSort with insert for n <= 10
-// using better partition
+function quickInsertSort(arr,comp){
+  return quickInsertSortRecurse(arr,comp,0,arr.length-1);
+}
+
+function quickInsertSortRecurse(arr,comp,lo,hi){
+  if(lo < hi)
+    if(lo + 10 < hi){
+      let pivot = partition3(arr,comp,lo,hi);
+      quickInsertSortRecurse(arr,comp,lo,pivot-1);
+      quickInsertSortRecurse(arr,comp,pivot+1,hi);
+    }else{
+      insertCustom(arr,comp,lo,1,hi+1);
+    }
+}
+
+function partition3(arr,comp,lo,hi){
+  var pivot = setupPivot(arr,comp,lo,Math.floor((lo+hi)/2), hi);
+  
+  var k = lo+1;
+  for(var i = lo+1; i < hi-1;i++){
+    if(comp(arr[i],pivot) < 0){
+      let temp = arr[i];
+      arr[i]   = arr[k];
+      arr[k]   = temp;
+      k++;
+    }
+  }
+  arr[hi-1] = arr[k];
+  arr[k]  = pivot;
+  return k;
+}
+
+function setupPivot(arr,comp,lo,mid,hi){
+  var a = arr[lo];
+  var b = arr[mid];
+  var c = arr[hi];
+  if(comp(a,b) > 0){
+    let t = a;
+    a = b;
+    b = c;
+  }
+  if(comp(a,c) >= 0){
+    let t = a;
+    a = c;
+    c = b;
+    b = t;
+  }else{
+    if (comp(b, c)) {
+      let t = b;
+      b = c;
+      c = t;
+    }
+  }
+  arr[lo] = a;
+  arr[hi] = c
+  
+  arr[mid] = arr[hi-1];
+  arr[hi-1] = b;
+  
+  return b;
+}
 ```
 
-_Compare result_
+This doesn't quite follow the things I laid above for a few reasons:
+  1. I don't want to be using `[].sort` in my implementation so I inlined that
+  2. For simplicity, I changed `f` to put the pivot on top and just return the pivot
+  3. Optimized a little by placing the non-pivot values on the right side of the pivot and did not include them in the main partition.
+
+This algorithm looks like:
+
+|   n   |     10     |     30     |     50     |     100     |     300     |
+|-------|------------|------------|------------|-------------|-------------|
+|Quick Insert + new Partition|![quick-insert-10](images/quick-insert-10.png)|![quick-insert-30](images/quick-insert-30.png)|![quick-insert-50](images/quick-insert-50.png)|![quick-insert-100](images/quick-insert-100.png)|![quick-insert-300](images/quick-insert-300.png)|
+
+Ok, that is definitely much closer than a pure quicksort. For `n=10` we get the
+insertion Sort as expected and we know do have those vertical lines at the bottom,
+midpoint and top. However, we are still missing something, the big red spot in the
+middle of the Array.sort graph is completely absent in this one.
+
+Though, we can at least deduce on more thing about Chrome's implementation. Note
+the double bar in our algorithm on the right vs the double bar on the left in Chrome's
+implementation.
+
+|   Quick Insert Sort   |         Array.sort         |
+|-----------------------|----------------------------|
+|![quick-insert-30](images/quick-insert-30.png)|![Array.sort-30](images/Array.sort-30.png)|
+
+So we know that chrome is partitioning putting the pivot on the bottom rather than the top.
+
+_A bit more_
 
 #### Final Cheating
 

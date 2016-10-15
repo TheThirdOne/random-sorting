@@ -163,24 +163,6 @@ function partition(arr,comp,lo,hi){
   return k;
 }
 
-
-function quickInsertSort(arr,comp){
-  return quickInsertSortRecurse(arr,comp,0,arr.length-1);
-}
-
-//quicksort on a slice of the array
-function quickInsertSortRecurse(arr,comp,lo,hi){
-  if(lo < hi)
-    if(lo + 10 < hi){ //if sub array > 10 elements, partition otherwise insert
-      let pivot = partition(arr,comp,lo,hi);
-      quickInsertSortRecurse(arr,comp,lo,pivot-1);
-      quickInsertSortRecurse(arr,comp,pivot+1,hi);
-    }else{
-      insertCustom(arr,comp,lo,1,hi+1);
-    }
-}
-
-
 // FireFox analysis
 
 // Runs Insertion sort on 3 wide sub arrays along the entire array
@@ -283,19 +265,68 @@ function mergeOpt(a1,a2,lo,hi,top,comp){
 
 // Todo: include sub-sorts used in analysis
 
+// Chrome Analysis
+function quickInsertSort(arr,comp){
+  return quickInsertSortRecurse(arr,comp,0,arr.length-1);
+}
 
+function quickInsertSortRecurse(arr,comp,lo,hi){
+  if(lo < hi)
+    if(lo + 10 < hi){
+      let pivot = partition3(arr,comp,lo,hi);
+      quickInsertSortRecurse(arr,comp,lo,pivot-1);
+      quickInsertSortRecurse(arr,comp,pivot+1,hi);
+    }else{
+      insertCustom(arr,comp,lo,1,hi+1);
+    }
+}
 
+function partition3(arr,comp,lo,hi){
+  var pivot = setupPivot(arr,comp,lo,Math.floor((lo+hi)/2), hi);
+  
+  var k = lo+1;
+  for(var i = lo+1; i < hi-1;i++){
+    if(comp(arr[i],pivot) < 0){
+      let temp = arr[i];
+      arr[i]   = arr[k];
+      arr[k]   = temp;
+      k++;
+    }
+  }
+  arr[hi-1] = arr[k];
+  arr[k]  = pivot;
+  return k;
+}
 
-
-
-
-
-
-
-
-
-
-
+function setupPivot(arr,comp,lo,mid,hi){
+  var a = arr[lo];
+  var b = arr[mid];
+  var c = arr[hi];
+  if(comp(a,b) > 0){
+    let t = a;
+    a = b;
+    b = c;
+  }
+  if(comp(a,c) >= 0){
+    let t = a;
+    a = c;
+    c = b;
+    b = t;
+  }else{
+    if (comp(b, c)) {
+      let t = b;
+      b = c;
+      c = t;
+    }
+  }
+  arr[lo] = a;
+  arr[hi] = c
+  
+  arr[mid] = arr[hi-1];
+  arr[hi-1] = b;
+  
+  return b;
+}
 
 
 
