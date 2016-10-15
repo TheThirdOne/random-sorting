@@ -21,11 +21,11 @@ algorithms work simply through this type of random analysis.
 
 As can probably be assumed form the title of this post, this post will be about
 analysis of sorting algorithms through a different method. As such, the standard
-method using Big O notation would be useful to know before reading, but is not
+method using Big O notation might be useful to know before reading, but is not
 strictly neccessary as this will not contain any references to Big O after this.
 However, some familiarity with the various sorting algorithms is almost a neccessity.
 The implementation of  each of the algotihms is shown though, so with a quick read
-of wikipedia it should be possible to know plenty of the analysis on your own.
+of wikipedia it should be possible to learn enough to follow if you are determined.
 
 If you have taken any introductary CS classes that had a section on sorting algorithms
 you should be fine.
@@ -561,6 +561,8 @@ Which is not right, it is still really close to the default merge sort. We need
 something to make merge sort more chunky and let the insertion sort shine through
 more.
 
+#### Some Cheating (Looking at the source code)
+
 I can't infer from the graphs what the difference in our implementations is. So
 I am going to cheat a little and look at the source code of spider monkey.
 
@@ -580,7 +582,10 @@ are so similar.
 
 The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L41):
 
-Note this check simply allows it to be slightly faster than the naive implementation, it does not affect correctness (assuming that the comparator is transitive ie ((a > b), (b > c) -> (a > c)))or Big O runtime.
+Note this check simply allows it to be slightly faster than the naive implementation,
+it does not affect correctness (assuming that the comparator is transitive
+ie ((a > b), (b > c) -> (a > c)))or Big O runtime.
+
 ```
 if (!lessOrEqual) {
         /* Runs are not already sorted, merge them. */
@@ -728,14 +733,13 @@ function quickInsertSort(arr,comp){
 }
 
 function quickInsertSortRecurse(arr,comp,lo,hi){
-  if(lo < hi)
-    if(lo + 10 < hi){
-      let pivot = partition3(arr,comp,lo,hi);
-      quickInsertSortRecurse(arr,comp,lo,pivot-1);
-      quickInsertSortRecurse(arr,comp,pivot+1,hi);
-    }else{
-      insertCustom(arr,comp,lo,1,hi+1);
-    }
+  if(lo + 10 < hi){
+    let pivot = partition3(arr,comp,lo,hi);
+    quickInsertSortRecurse(arr,comp,lo,pivot-1);
+    quickInsertSortRecurse(arr,comp,pivot+1,hi);
+  }else{
+    insertCustom(arr,comp,lo,1,hi+1);
+  }
 }
 
 function partition3(arr,comp,lo,hi){
@@ -810,15 +814,64 @@ implementation.
 |-----------------------|----------------------------|
 |![quick-insert-30](images/quick-insert-30.png)|![Array.sort-30](images/Array.sort-30.png)|
 
-So we know that chrome is partitioning putting the pivot on the bottom rather than the top.
+So we know that chrome is partitioning putting the pivot on the bottom rather than
+the top. Changing that doesn't make a significant difference though.
 
-_A bit more_
+Like with Firefox's Implementation, it looks like its not trivial to guess how to
+make our current guess better.
 
-#### Final Cheating
+#### Some more Cheating
 
-_Here is how we did well / messed up_
+Like with FireFox's source, [v8's source](https://github.com/v8/v8/) is also on
+Github. Then looking in the most obvious file [array.js](https://github.com/v8/v8/blob/master/src/js/array.js),
+we find [InnerArraySort](https://github.com/v8/v8/blob/master/src/js/array.js#L710)
+which implements Array.sort. There are a bunch of extra checks in that function,
+but we only really care about up till [line 844](https://github.com/v8/v8/blob/master/src/js/array.js#L844).
+Disregarding [GetThirdIndex](https://github.com/v8/v8/blob/master/src/js/array.js#L742)
+and some checks, we have effectively identical code up to [line 804](https://github.com/v8/v8/blob/master/src/js/array.js#L804).
 
+Note that:
 
+```
+while (true) {
+  // Insertion sort is faster for short arrays.
+  if (to - from <= 10) {
+    InsertionSort(a, from, to);
+    return;
+  }
+  
+  //...
+  //...
+  
+  
+  if (to - high_start < low_end - from) {
+    QuickSort(a, high_start, to);
+    to = low_end;
+  } else {
+    QuickSort(a, from, low_end);
+    from = high_start;
+  }
+}
+```
+
+is essentially just inlining the [tail call](https://en.wikipedia.org/wiki/Tail_call) of
+
+```
+function quickInsertSortRecurse(arr,comp,lo,hi){
+  if(lo + 10 < hi){
+    let pivot = partition3(arr,comp,lo,hi);
+    quickInsertSortRecurse(arr,comp,lo,pivot-1);
+    quickInsertSortRecurse(arr,comp,pivot+1,hi);
+  }else{
+    insertCustom(arr,comp,lo,1,hi+1);
+  }
+}
+```
+
+The main difference is in the partitioning step (which is the meat of Quick Sort).
+Chrome is using a more complex partition which is partitions the array into three
+peices (less than pivot, equal to pivot, and greater than pivot); ours simply partitions
+into two (less than, and greater than or equal to).
 
 ## Final Words
 
@@ -858,4 +911,4 @@ free to make a Pull request to add it.
 
 ### Shell Sort
 ### Comb Sort
-### Coktail Shaker Sort
+### Cocktail Shaker Sort

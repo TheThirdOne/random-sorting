@@ -271,14 +271,13 @@ function quickInsertSort(arr,comp){
 }
 
 function quickInsertSortRecurse(arr,comp,lo,hi){
-  if(lo < hi)
-    if(lo + 10 < hi){
-      let pivot = partition3(arr,comp,lo,hi);
-      quickInsertSortRecurse(arr,comp,lo,pivot-1);
-      quickInsertSortRecurse(arr,comp,pivot+1,hi);
-    }else{
-      insertCustom(arr,comp,lo,1,hi+1);
-    }
+  if(lo + 10 < hi){
+    let pivot = partition3(arr,comp,lo,hi);
+    quickInsertSortRecurse(arr,comp,lo,pivot-1);
+    quickInsertSortRecurse(arr,comp,pivot+1,hi);
+  }else{
+    insertCustom(arr,comp,lo,1,hi+1);
+  }
 }
 
 function partition3(arr,comp,lo,hi){
