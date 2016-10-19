@@ -134,6 +134,7 @@ function copy(a1,a2,lo,hi){
   }
 }
 
+
 function quickSort(arr,comp){
   return quickSortRecurse(arr,comp,0,arr.length-1);
 }
@@ -272,7 +273,7 @@ function quickInsertSort(arr,comp){
 
 function quickInsertSortRecurse(arr,comp,lo,hi){
   if(lo + 10 < hi){
-    let pivot = partition3(arr,comp,lo,hi);
+    let pivot = partition2(arr,comp,lo,hi);
     quickInsertSortRecurse(arr,comp,lo,pivot-1);
     quickInsertSortRecurse(arr,comp,pivot+1,hi);
   }else{
@@ -280,7 +281,7 @@ function quickInsertSortRecurse(arr,comp,lo,hi){
   }
 }
 
-function partition3(arr,comp,lo,hi){
+function partition2(arr,comp,lo,hi){
   var pivot = setupPivot(arr,comp,lo,Math.floor((lo+hi)/2), hi);
   
   var k = lo+1;
@@ -327,7 +328,47 @@ function setupPivot(arr,comp,lo,mid,hi){
   return b;
 }
 
+function quickInsertSort2(arr,comp){
+  return quickInsertSort2Recurse(arr,comp,0,arr.length-1);
+}
 
+function quickInsertSort2Recurse(arr,comp,lo,hi){
+  if(lo + 10 < hi){
+    let [a,b] = partition3(arr,comp,lo,hi);
+    quickInsertSort2Recurse(arr,comp,lo,a-1);
+    quickInsertSort2Recurse(arr,comp,b+1,hi);
+  }else{
+    insertCustom(arr,comp,lo,1,hi+1);
+  }
+}
+
+function partition3(arr,comp,lo,hi){
+  var pivot = setupPivot(arr,comp,lo,Math.floor((lo+hi)/2), hi);
+  
+  var eqlo = lo+1, eqhi = hi-1;
+  for(let i = lo+2; i <= eqhi;i++){
+    var c = comp(arr[i],pivot);
+    if(c < 0){
+      // move arr[i] below the equal range
+      let t = arr[eqlo];
+      arr[eqlo] = arr[i];
+      arr[i] = t;
+      eqlo++;
+    }else if(c > 0){
+      // move arr[i] above the equal range
+      let t = arr[eqhi];
+      arr[eqhi] = arr[i];
+      arr[i] = t;
+      eqhi--;
+      i--; //the value at arr[i] has not yet been processed so stall the loop
+    } // if c === 0, do nothing, it is in the right place
+  }
+  // state of sub array:
+  //  [lo,eqlo) is less than pivot
+  //  [eqlo,eqhi] is equal to pivot
+  //  (eqhi,hi) is greater than pivot
+  return [eqlo,eqhi];
+}
 
 
 

@@ -91,7 +91,7 @@ not change any results as the javascript sorts should perform the same.
 
 Note: Varying array lengths (n) are used shown because some of the features of the graph may be clearer at a lower resolution. Also for Chrome `n=10` vs `n=30` are very different graphs.
 
-Based simply on these histograms, can you guess which algorithm Chrome is using?
+Based simply on these histograms, can you guess which algorithm Chrome is using
 If you can, that is very impressive; if you can't, it should become more clear
 as we continue and look at other algorithms.
 
@@ -400,7 +400,13 @@ function copy(a1,a2,lo,hi){
 }
 ```
 
-_Full analysis of MergeSort_
+Like with heapsort separating the mergesort into discrete steps may give us greater insight into the workings of the algorithm.
+
+Lets just expand `for(var w = 1; w < arr.length; w *= 2){` and make a graph for each `w`
+
+|   w   |     1      |      2     |     4     |     8     |
+|-------|------------|------------|-----------|-----------|
+|mergeStep(w)|![merge-step-1](images/merge-step-1.png)|![merge-step-2](images/merge-step-2.png)|![merge-step-4](images/merge-step-4.png)|![merge-step-8](images/merge-step-8.png)|
 
 #### Conection to Array.sort
 
@@ -584,7 +590,7 @@ The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/
 
 Note this check simply allows it to be slightly faster than the naive implementation,
 it does not affect correctness (assuming that the comparator is transitive
-ie ((a > b), (b > c) -> (a > c)))or Big O runtime.
+ie ((a > b), (b > c) -> (a > c))) or Big O runtime.
 
 ```
 if (!lessOrEqual) {
@@ -869,9 +875,67 @@ function quickInsertSortRecurse(arr,comp,lo,hi){
 ```
 
 The main difference is in the partitioning step (which is the meat of Quick Sort).
-Chrome is using a more complex partition which is partitions the array into three
-peices (less than pivot, equal to pivot, and greater than pivot); ours simply partitions
-into two (less than, and greater than or equal to).
+Chrome is using a more complex partition (which is somewhat hard to understand due
+to optimizations) which is partitions the array into three peices (less than pivot,
+equal to pivot, and greater than pivot); ours simply partitions into two (less than,
+and greater than or equal to).
+
+Reworking our partitition (and recurse method) to account like the following should
+give us a very similar graph to Chrome's implementation.
+
+```
+function quickInsertSort2Recurse(arr,comp,lo,hi){
+  if(lo + 10 < hi){
+    let [a,b] = partition3(arr,comp,lo,hi);
+    quickInsertSort2Recurse(arr,comp,lo,a-1);
+    quickInsertSort2Recurse(arr,comp,b+1,hi);
+  }else{
+    insertCustom(arr,comp,lo,1,hi+1);
+  }
+}
+
+function partition3(arr,comp,lo,hi){
+  var pivot = setupPivot(arr,comp,lo,Math.floor((lo+hi)/2), hi);
+  
+  var eqlo = lo+1, eqhi = hi-1;
+  for(let i = lo+2; i <= eqhi;i++){
+    var c = comp(arr[i],pivot);
+    if(c < 0){
+      // move arr[i] below the equal range
+      let t = arr[eqlo];
+      arr[eqlo] = arr[i];
+      arr[i] = t;
+      eqlo++;
+    }else if(c > 0){
+      // move arr[i] above the equal range
+      let t = arr[eqhi];
+      arr[eqhi] = arr[i];
+      arr[i] = t;
+      eqhi--;
+      i--; //the value at arr[i] has not yet been processed so stall the loop
+    } // if c === 0, do nothing, it is in the right place
+  }
+  // state of sub array:
+  //  [lo,eqlo) is less than pivot
+  //  [eqlo,eqhi] is equal to pivot
+  //  (eqhi,hi) is greater than pivot
+  return [eqlo,eqhi];
+}
+```
+
+|   n   |     10     |     30     |     50     |     100     |     300     |
+|-------|------------|------------|------------|-------------|-------------|
+|Quick Insert + new new Partition|![quick-insert2-10](images/quick-insert2-10.png)|![quick-insert2-30](images/quick-insert2-30.png)|![quick-insert2-50](images/quick-insert2-50.png)|![quick-insert2-100](images/quick-insert2-100.png)|![quick-insert2-300](images/quick-insert2-300.png)|
+
+And it does. Success.
+
+One question that this raises though is how much does insertion sort play a role in defining the shape of the graph
+
+Changing the cutoff length to 50
+
+![image](image)
+
+
 
 ## Final Words
 
@@ -884,6 +948,10 @@ we can get most of the way to understanding what is happening inside the black b
 Getting to an exact match of the implementation may be hard to do, but if achieved
 through some separate method. This method can validate much of the behaviour of the
 reproduced algorithm.
+
+On a slightly different note, this method also allows us to "see" logical equivilances.
+Two methods that may have very similar code, but a slight difference such as an extra
+if, might generate very different graphs.
 
 Hints for applying this type of technique to other types of problems:
   - Find undefined behaviour that would differentiate algorithms
