@@ -91,7 +91,7 @@ not change any results as the javascript sorts should perform the same.
 
 Note: Varying array lengths (n) are used shown because some of the features of the graph may be clearer at a lower resolution. Also for Chrome `n=10` vs `n=30` are very different graphs.
 
-Based simply on these histograms, can you guess which algorithm Chrome is using
+Based simply on these histograms, can you guess which algorithm Chrome is using?
 If you can, that is very impressive; if you can't, it should become more clear
 as we continue and look at other algorithms.
 
@@ -107,10 +107,9 @@ simple and have relatively easy to understand graphs.
 |Insertion|![insertion-10](images/insertion-10.png)|![insertion-30](images/insertion-30.png)|![insertion-50](images/insertion-50.png)|![insertion-100](images/insertion-100.png)|![insertion-300](images/insertion-300.png)|
 |Selection|![selection-10](images/selection-10.png)|![selection-30](images/selection-30.png)|![selection-50](images/selection-50.png)|![selection-100](images/selection-100.png)|![selection-300](images/selection-300.png)|
 
-### Bubble Sort
+### [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort)
 
-If you are unfamiliar with [Bubble Sort](https://en.wikipedia.org/wiki/Bubble_sort),
-the TLDR is each pair of elements `a[j]` and `a[j+1]` are compared and swapped in
+Bubble sort compares and swaps each pair of elements `a[k]` and `a[k+1]` in
 successive `n` passes over the array.
 
 The implementation I made was as follows:
@@ -131,25 +130,25 @@ function bubbleSort(arr,comp){
 
 The most striking thing about the graph is that the high points in the graph are
 mostly in a line from the top left to the bottom right. This should be expected
-because insertion sort will not be changing the order much because the random comparison
-is as about as likely to move an element up as down. That is more surprising is
-that it quite non-symmtric; the the distribution narrows from the top to the bottom
-and near the top corner it flairs a little.
+because bubble sort will not be changing the order much because the random comparison
+is as about as likely to move an element up as down (in the middle of the array).
+What is more surprising is that it quite non-symmtric; the the distribution narrows
+from the top to the bottom and near the top corner it flairs a little.
 
 The distribution narrowing is due to an optimization that allows bubble sort to
-not repeatedly compare the top elements. Because after `n` interation the top `n`
-elements will be sorted, bubble sort stops earlier than the end of the list. As a
-result, the elements at the top of the array have less of a chance to move than the
-bottom ones.
+not repeatedly compare the top elements. Because after the `i`th interation the top
+`i` elements will be in there final position, this implementation stops when it gets
+to that point. As a result, the elements at the top of the array have less of a
+chance to move than the bottom ones.
 
-The flairing is a little more complicated, so I will leave it for later analysis.
-_maybe continue with this_
+The flairing that is most prominent in the `n=30` graph is mostly due to the bottom
+elements getting jumbled many times before they get to settle into there final positions
+so they have time to get close to randomly shuffled.
 
-### Insertion Sort
+### [Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort)
 
-If you are unfamiliar with [Insertion Sort](https://en.wikipedia.org/wiki/Insertion_sort),
-the TLDR is that elements are sorted by consecutive insertion (perserving sortedness)
-into `a[0:j]` (a sorted array by interation `j`).
+Insertion sort sorts by consecutively inserting (perserving sortedness) into `a[0:j]`
+(a sorted array by interation `j`).
 
 The implementation I made was as follows:
 
@@ -172,19 +171,18 @@ function insertionSort(arr,comp){
 Insetion Sort has an incredibly simple graph. Most elements stay close to where
 they were initially with a nearly constant deviation. This is because each element
 compares with the one just below it and stays in place 2/3 of the time. So each
-element has a exponetially decaying by `1/3*d` (where `d` is distance from starting
-position if we don't consider the left and right bounds on the array). My display
+element has a exponetially decaying by `1/3^d` (where `d` is distance from starting
+position for most elements, the edges are slightly more complicated). My display
 system is not accurate enough to see when `d > ~5`; so we can only see a slight
 change is distribution at the first and last elements.
 
 Showing how that edge conditions works will be left as an exercise for the reader
-as the math is relatively simple, but too time consuming to write more about here.
+as the math is relatively simple, but too time consuming to detail here. _Not happy with this_
 
-### Selection Sort
+### [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort)
 
-If you are unfamiliar with [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort),
-the TLDR is that the largest element is selected (looking from bottom to top) and
-moved to the end of the array.
+Selection sorts selects the largest element (by [linear search](https://en.wikipedia.org/wiki/Linear_search))
+and swaps it with the `n-i` position for `n` iterations.
 
 The implementation I made was as follows:
 
@@ -211,10 +209,14 @@ the 0th element is now at the end of the array and is the most likely pick. This
 continues down the line until the end of the array was more likely to be picked
 than to have this type of pattern hold.
 
+Therfore if we change  `if(comp(arr[j],arr[k]) > 0){` to `if(comp(arr[j],arr[k]) >= 0){`,
+then the `~1/3` should change to `~2/3` and the behaviour at the end should sharpen
+_I don't like that word choice_.
+
 I have not worked out the math for exactly where the cut off should be for the
 tradeoff between those two patterns, and am also unsure on how exactly the pattern
 arises aside from what I have stated above. If you think you understand it well
-please create an issue on github.
+please create an issue on github. _Not happy with this_
 
 ## Complex / Effecient Sorts
 
@@ -229,16 +231,15 @@ we can start to expect to see some similarities to the implementations of Array.
 |Quick|![quick-10](images/quick-10.png)|![quick-30](images/quick-30.png)|![quick-50](images/quick-50.png)|![quick-100](images/quick-100.png)|![quick-300](images/quick-300.png)|
 
 
-### Heap Sort
+### [Heap Sort](https://en.wikipedia.org/wiki/Heap_sort)
 
-If you are unfamiliar with [Heap Sort](https://en.wikipedia.org/wiki/Heap_sort),
-the TLDR is that the array is manipulated into a [heap](https://en.wikipedia.org/wiki/Heap_(data_structure))
+Heap Sort manipulates the array into a [heap](https://en.wikipedia.org/wiki/Heap_(data_structure))
 (generally [in place](https://en.wikipedia.org/wiki/In-place_algorithm) as a
 [binary tree](https://en.wikipedia.org/wiki/Binary_tree)). Then the maximum element
 is taken out and moved to the end of the unsorted array and the heap is reorganized
 to be a heap again.
 
-The implementation I made was as follows:
+The implementation I made was as follows (slightly more complicated then neccasary as it allows working on a subarray):
 
 ```
 function heapSort(arr,comp){
@@ -293,16 +294,16 @@ part and the for loop part.
 |![Heapify](images/heapify-300.png)|![Heap Loop](images/heap-loop-300.png)|
 
 From this it is quite clear that `heapify` is the cause of the multiple lines and
-the loop fills in the graph. But how do we know that the Loop image is an accurate
-representation of what Heap Sort is doing; the setup to it is commented out so how
-can its graph be valid on its own.
+the loop causes the crosshatching pattern. But how do we know that the Loop image
+is an accurate representation of what Heap Sort is doing; the setup to it is commented
+out so how can its graph be valid on its own. _would prefer to start with compose up front, maybe in the intro the the new section_
 
 We can answer that concern be trying to reassemble the original heap sort from the
 peices. We simply need to find out how to compose one graph on top of another.
 
 This "compose" operation can just be thought of as a matrix multiplication. The
 exact reason why "compose" is a matrix multiplication is not very important or interesting
-so it will be left as an exercise for the reader.
+so it will be left as an exercise for the reader. _I would like to be less dissmisive here, but I do not want to even try to explain that_
 
 As javascript does not have a matrix multiplication built in and I don't want to
 bring in a library. I implemented it as:
@@ -331,21 +332,33 @@ indistinguishable from the normal Heap Sort graph.
 |----------------------------|-----------------|
 |![Composed Heap Sort](images/composed-heap-300.png)|![Heap Sort](images/heap-300.png)|
 
-_Analysis of Heapify_
+One important thing to note here is that our "composition" only matches because
+we are using a completely random compartor, as long as we don't break any ifs this
+is valid. With a normal comparator, it would not be valid because the loop depends
+on the values swapped in heapify.
 
-_Analysis of the Loop_
+In heapify notice that each line has a line that has twice its slope and half its
+slope. If we changed, the binary heap to a ternary heap or some higher [d-ary heap](https://en.wikipedia.org/wiki/D-ary_heap)
+I would expect the slopes to correlate because they come from swapping parents
+width children.
 
+|  Binary  |  Ternary  |  4-ary  |
+|----------|-----------|---------|
+|![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/tern-heap-50.png)||![4ary Heap Sort](images/4-heap-50.png)|
 
-### Merge Sort
+The loop is a little harder to come to a good understanding of. There are still a
+few lines like the ones in heapify, but they are overshadowed by the pattern on the
+top of the main line. The pattern on the left is from _cause_.
 
-If you are unfamiliar with [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort),
-the TLDR is that it merges (sorted) subarrays until it has merged the entire array.
+### [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort)
+
+Merge sort merges (sorted) subarrays until it has merged the entire array.
 
 There are two main ways of implementing merge sort: bottom-up and top-down. Originally
 I had implemented it top-down (because its slightly easier that way), but implemented
 it bottom-up to use the compose analysis on it (it is easier to separate analysis
-with loops and because it is slightly more efficient, the browsers were more likely
-to implement it this way).
+with loops rather than recursion and because it is slightly more efficient, the
+browsers were more likely to implement it this way).
 
 My bottom-up implementation I made was as follows:
 
@@ -400,16 +413,21 @@ function copy(a1,a2,lo,hi){
 }
 ```
 
-Like with heapsort separating the mergesort into discrete steps may give us greater insight into the workings of the algorithm.
+Like with heapsort separating the merge sort into discrete steps may give us greater
+insight into the workings of the algorithm. Lets just expand `for(var w = 1; w < arr.length; w *= 2){`
+and make a graph for each `w`. (This essentially graphing merge with the right parameters)
 
-Lets just expand `for(var w = 1; w < arr.length; w *= 2){` and make a graph for each `w`
+Note: not all `w`s are shown for sake of space.
 
-|   w   |     1      |      2     |     4     |     8     |
+|   w   |     1      |      4     |     32    |    128    |
 |-------|------------|------------|-----------|-----------|
-|mergeStep(w)|![merge-step-1](images/merge-step-1.png)|![merge-step-2](images/merge-step-2.png)|![merge-step-4](images/merge-step-4.png)|![merge-step-8](images/merge-step-8.png)|
+|mergeStep(w)|![merge-step-1](images/merge-step-1.png)|![merge-step-4](images/merge-step-4.png)|![merge-step-32](images/merge-step-32.png)|![merge-step-128](images/merge-step-128.png)|
+
+It is not quite clear how these build the final. _But more analysis_
 
 #### Conection to Array.sort
 
+_Very not happy with this section_
 One important thing ot notice is that Merge Sort looks very similar to what Firefox's
 implementation looked like. There is a certain "logrithmicness" present in both.
 In the Firefox implementation it is more jagged, but it is clear that somehow Firefox
@@ -419,12 +437,11 @@ is using merge sort.
 |-----------------------|---------------------------|
 |![Merge Sort](images/merge-300.png)|![Array.sort](images/FArray.sort-300.png)|
 
-### Quick Sort
+### [Quick Sort](https://en.wikipedia.org/wiki/Quick_sort)
 
-If you are unfamiliar with [Quick Sort](https://en.wikipedia.org/wiki/Quick_sort),
-the TLDR is that it picks a pivot value (this is the largest differenece between
-different quicksort implementations) and moves all smaller elments to the left of
-it and all larger ones to the right then recurses on those two smaller arrays.
+Quick sort picks a pivot value (this is the largest differenece between different
+quicksort implementations),partitions the array into two sections: elements greater
+than the pivot and elements less than pivot, and then quicksorts those subarrays.
 
 The implementation I made was as follows:
 
@@ -922,10 +939,10 @@ function partition3(arr,comp,lo,hi){
   return [eqlo,eqhi];
 }
 ```
-
+ 
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
-|Quick Insert + new new Partition|![quick-insert2-10](images/quick-insert2-10.png)|![quick-insert2-30](images/quick-insert2-30.png)|![quick-insert2-50](images/quick-insert2-50.png)|![quick-insert2-100](images/quick-insert2-100.png)|![quick-insert2-300](images/quick-insert2-300.png)|
+|Quick Insert + new new Partition|![quick-insert2-10](images/quick-insert2-10.png)|![quick-insert2-30](images/quick-insert2-30.png)|![quick-insert2-50](images/quick-insert2-50.png)|![quick-insert2-
 
 And it does. Success.
 
