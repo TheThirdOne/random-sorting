@@ -344,7 +344,7 @@ width children.
 
 |  Binary  |  Ternary  |  4-ary  |
 |----------|-----------|---------|
-|![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/tern-heap-50.png)||![4ary Heap Sort](images/4-heap-50.png)|
+|![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/tern-heap-50.png)|![4ary Heap Sort](images/4-heap-50.png)|
 
 The loop is a little harder to come to a good understanding of. There are still a
 few lines like the ones in heapify, but they are overshadowed by the pattern on the
@@ -942,7 +942,7 @@ function partition3(arr,comp,lo,hi){
  
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
-|Quick Insert + new new Partition|![quick-insert2-10](images/quick-insert2-10.png)|![quick-insert2-30](images/quick-insert2-30.png)|![quick-insert2-50](images/quick-insert2-50.png)|![quick-insert2-
+|Quick Insert + new new Partition|![quick-insert2-10](images/quick-insert2-10.png)|![quick-insert2-30](images/quick-insert2-30.png)|![quick-insert2-50](images/quick-insert2-50.png)|![quick-insert2-100](images/quick-insert2-100.png)|![quick-insert2-300](images/quick-insert2-300.png)|
 
 And it does. Success.
 
@@ -950,9 +950,7 @@ One question that this raises though is how much does insertion sort play a role
 
 Changing the cutoff length to 50
 
-![image](image)
-
-
+![quick-insert-50-100](images/quick-insert-50-100.png)
 
 ## Final Words
 
