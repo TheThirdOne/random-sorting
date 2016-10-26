@@ -344,7 +344,7 @@ width children.
 
 |  Binary  |  Ternary  |  4-ary  |
 |----------|-----------|---------|
-|![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/tern-heap-50.png)|![4ary Heap Sort](images/4-heap-50.png)|
+|![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/ternary-heap-50.png)|![4ary Heap Sort](images/4ary-heap-50.png)|
 
 The loop is a little harder to come to a good understanding of. There are still a
 few lines like the ones in heapify, but they are overshadowed by the pattern on the
@@ -948,9 +948,13 @@ And it does. Success.
 
 One question that this raises though is how much does insertion sort play a role in defining the shape of the graph
 
-Changing the cutoff length to 50
+Interesting aside:
 
-![quick-insert-50-100](images/quick-insert-50-100.png)
+Changing the cutoff for using insertion sort can perhaps help us understand why this patterns occurs.
+
+|   n   |     20     |     30     |     40     |     50     |
+|-------|------------|------------|------------|------------|
+||![quick-insert3-20-100](images/quick-insert3-20-100.png)|![quick-insert3-30-100](images/quick-insert3-30-100.png)|![quick-insert3-40-100](images/quick-insert3-40-100.png)|![quick-insert3-50-100](images/quick-insert3-50-100.png)|
 
 ## Final Words
 
@@ -974,7 +978,7 @@ Hints for applying this type of technique to other types of problems:
     - Randomness abuses all three and thus the output is undefined
   - Find a way to visualize or aggregate the data
   - Implement several algorithms and test them to understand patterns
-  -
+
 ### Next Steps
 
 Some possible ways to build off this:

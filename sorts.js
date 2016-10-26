@@ -44,23 +44,18 @@ function selectionSort(arr,comp){
 // Effecient Algorithms
 // Heap, Merge, Quick
 
-//TODO: rework to remove Custom, it wasn't neccessary (for now at least)
 function heapSort(arr,comp){
-  heapSortCustom(arr,comp,0,arr.length);
-}
-
-function heapSortCustom(arr,comp,start,end){
-  heapify(arr, comp, start, end);
-  for(var i = end-1; i > start;i--){
+  heapify(arr, comp);
+  for(var i = end-1; i > 0;i--){
     let t = arr[i];
-    arr[i] = arr[start];
-    arr[start] = t;
-    siftDown(arr, comp, start, start, i-1)
+    arr[i] = arr[0];
+    arr[0] = t;
+    siftDown(arr, comp, 0, 0, i-1)
   }
 }
-function heapify(arr, comp,start,end){
-  for(var i = Math.floor(((end-1)+start-1)/2); i >= start; i--){
-    siftDown(arr, comp, i, start, end - 1);
+function heapify(arr, comp){
+  for(var i = Math.floor((arr.length-2)/2); i >= 0; i--){
+    siftDown(arr, comp, i, 0, arr.length - 1);
   }
 }
 function siftDown(arr, comp, root, start, end){

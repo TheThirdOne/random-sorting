@@ -58,10 +58,67 @@ function mergeStep(w){
 }
 
 
+function quickInsertSort3(a){
+  return function(arr,comp){
+    var quickInsertSort3Recurse = function(arr,comp,lo,hi){
+      if(lo + a < hi){
+        let [a,b] = partition3(arr,comp,lo,hi);
+        quickInsertSort3Recurse(arr,comp,lo,a-1);
+        quickInsertSort3Recurse(arr,comp,b+1,hi);
+      }else{
+        insertCustom(arr,comp,lo,1,hi+1);
+      }
+    };
+    return quickInsertSort3Recurse(arr,comp,0,arr.length-1);
+  };
+}
+
+function daryHeap(d){
+  var heapify = function(arr, comp){
+    for(var i = Math.floor((arr.length-2)/d); i >= 0; i--){
+      siftDown(arr, comp, i, 0, arr.length - 1);
+    }
+  };
+  var siftDown = function(arr, comp, root, start, end){
+    while(d*root + 1 - start <= end){
+      let child = d*root+1-start;
+      let tmp = root;
+  
+      if(comp(arr[child],arr[tmp])>0){
+        tmp = child;
+      }
+      for(let i = 1; i < d; i++){
+        if(child+i <= end && comp(arr[child+i],arr[tmp])>0){
+          tmp = child + i;
+        }
+      }
+      if(tmp  == root){
+        return;
+      }else{
+        let t = arr[root];
+        arr[root] = arr[tmp];
+        arr[tmp] = t;
+        root = tmp;
+      }
+    }
+  };
+  return function(arr,comp){
+    heapify(arr, comp);
+    for(var i = arr.length-1; i > 0;i--){
+      let t = arr[i];
+      arr[i] = arr[0];
+      arr[0] = t;
+      siftDown(arr, comp, 0, 0, i-1);
+    }
+  };
+}
+
+
 var jsSorts = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],                                       // Introduction
   ...standard(bubbleSort,'bubble'),...standard(insertionSort,'insertion'),...standard(selectionSort,'selection'), // Simple algorithms
   ...standard(heapSort, 'heap'),   ...standard(mergeSort,    'merge'), ...standard(quickSort,    'quick'),        // Effecient algorithms
   [300, (a,c)=>heapify(a,c,0,a.length), 'heapify-300'], [300, heapLoop, 'heap-loop-300'],                         // Heap Analysis
+  [50, daryHeap(3), 'ternary-heap-50'], [50, daryHeap(4), '4ary-heap-50'],
   [300, mergeStep(1), 'merge-step-1'], [300, mergeStep(2), 'merge-step-2'],[300, mergeStep(4), 'merge-step-4'],   // Merge Analysis
   [300, mergeStep(8), 'merge-step-8'],[300, mergeStep(16), 'merge-step-16'],
   [300, mergeStep(32), 'merge-step-32'],[300, mergeStep(64), 'merge-step-64'],[300, mergeStep(128), 'merge-step-128'],
@@ -75,10 +132,11 @@ var jsSorts = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],     
   
   
   // Chrome Array.sort Analysis
-  [5, insertionSort,    'insertion-5'],    [12, insertionSort,    'insertion-12'],    [15, insertionSort,    'insertion-15'],
+  [5, insertionSort,    'insertion-5'],[12, insertionSort,    'insertion-12'],[15, insertionSort,    'insertion-15'],
   ...standard(quickInsertSort, 'quick-insert'),
-  ...standard(quickInsertSort2,'quick-insert2')
-]
+  ...standard(quickInsertSort2,'quick-insert2'),
+  [100, quickInsertSort3(20), 'quick-insert-20-100'],[100, quickInsertSort3(30), 'quick-insert-30-100'],[100, quickInsertSort3(40), 'quick-insert-40-100'],[100, quickInsertSort3(50), 'quick-insert-50-100']
+  ]
 
 var chromeSorts = [
     [5, (a,b)=>a.sort(b), 'Array.sort-5'],[12, (a,b)=>a.sort(b), 'Array.sort-12'],[15, (a,b)=>a.sort(b), 'Array.sort-15'], //special cases for comparing to insert sort
