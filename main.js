@@ -120,8 +120,8 @@ var jsSorts = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],     
   [300, (a,c)=>heapify(a,c,0,a.length), 'heapify-300'], [300, heapLoop, 'heap-loop-300'],                         // Heap Analysis
   [50, daryHeap(3), 'ternary-heap-50'], [50, daryHeap(4), '4ary-heap-50'],
   [300, mergeStep(1), 'merge-step-1'], [300, mergeStep(2), 'merge-step-2'],[300, mergeStep(4), 'merge-step-4'],   // Merge Analysis
-  [300, mergeStep(8), 'merge-step-8'],[300, mergeStep(16), 'merge-step-16'],
-  [300, mergeStep(32), 'merge-step-32'],[300, mergeStep(64), 'merge-step-64'],[300, mergeStep(128), 'merge-step-128'],
+  [300, mergeStep(8), 'merge-step-8'],[300, mergeStep(16), 'merge-step-16'],[300, mergeStep(32), 'merge-step-32'],
+  [300, mergeStep(64), 'merge-step-64'],[300, mergeStep(128), 'merge-step-128'],[300, mergeStep(256), 'merge-step-256'],
   
   
   // Firefox Array.sort Analysis
@@ -150,11 +150,19 @@ var firefoxSorts = [
 //TODO: compose(heapify,heaploop)
 
 
-function composeMergeStep(m){
+function composeMergeStep(m,disp){
   var start = m.get('merge-step-1');
-  for(var i = 2; i <= 128; i*=2){
+  for(var i = 2; i <= 256; i*=2){
     start = compose(start,m.get('merge-step-'+i));
     disp(graph(start));
+  }
+}
+
+function composeBackwardsMergeStep(m,disp){
+  var start = m.get('merge-step-256');
+  for(var i = 128; i >= 1; i/=2){
+    start = compose(m.get('merge-step-'+i),start);
+    disp(graph(start),'merge-steps-'+i+'-256');
   }
 }
 

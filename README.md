@@ -464,9 +464,12 @@ IE rather than composing like `((AB)C)D` and looking at each intermediate step. 
 can do `A(B(CD))` and look at each itermediate step. This is a valid method because
 matrix multiplication is [associative](https://en.wikipedia.org/wiki/Associative_property).
 
-*_TODO: table_*
+|   w   | (64-256) |  (16-256) |   (4-256) |  (1-256)  |
+|-------|----------|-----------|-----------|-----------|
+|steps in the range composed|![merge-steps-64-256](images/merge-steps-64-256.png)|![merge-steps-16-256](images/merge-steps-16-256.png)|![merge-steps-4-256](images/merge-steps-4-256.png)|![merge-steps-1-256](images/merge-steps-1-256.png)|
 
-And that explians why the pattern in merge sort arises just from the graph of merge.
+
+And that explains why the pattern in merge sort arises just from the graph of merge.
 
 
 #### Conection to Array.sort
