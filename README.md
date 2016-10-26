@@ -1,33 +1,63 @@
-# Analysis of Randomized Sorting Algorithms
+# Analysis of Sorting Algorithms using randomized Comparators
+
+Sorting Algorithms are normally analysized using broad strokes and leave the finer
+detials up to the particular implementation and require knowing the code of the
+algorithm in question. For reverse engineering, though, implementation detials are
+important, and the algorithm is a black box.
+
+Techniques such as timing analysis and fuzz testing both aid reverse engineering,
+but are no longer algorithm analysis and instead are simply methods of reverse engineering.
+They would no be used to if the code was known.
+
+If we are not allowed to inspect the code and only have access to a function, we
+can only really abuse the input. If the conditions of the algorithm are met, correctness
+is gareenteed for all algorithms. But by not meeting all of the conditions of the
+algorithms, we can tease out extra information.
+
+The algorithms we will be analyzing will expect a comparator like:
+
+```
+           -1 if x < y
+  C(x,y) =  0 if x = y
+            1 if x > y
+```
+
+This is a common option for sorting algorithms because it provides a way for all
+possible inputs have `>`, `=`, and `<` defined.
+
+The conditions we will be breaking are:
+  - Reflexivity: a = a
+  - Antisymmetrty: if a >= b, then b <= a
+  - Transitivty: if a >= b and b >= c, a >= c
+
+This will be done by defining a random comparator.
+
+```
+  c(x,y) = uniformly randomly select from [-1,0,1]
+```
+
 ## Inspiration
 
 In [a tangential conversation](https://news.ycombinator.com/item?id=12568194) on
 Hacker News, [RKoutnik](https://news.ycombinator.com/user?id=RKoutnik) figure out
-the problem with using code like `arr.sort(()=>Math.floor(Math.random()*3)-1)`.
+the problem with using code like `arr.sort(()=>Math.floor(Math.random()*3)-1)` to
+shuffle an array.
 
-Essentially the code above says to randomly sort the array, but does so by randomizing
-comparison function. This does not make the output array's order completely random,
-the order of the output array will largely depend on which sorting algorithm was used.
+The problem with this is that it does not actually shuffle the array, it randomly
+sorts it. The first element may often stay where it is. As most algorithms try to
+avoid unneccessary swaps, this would be a likley case.
 
-Note: The correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-
-
-*_Likely to be gone in later edits:_*
-When I first read this conversation, I remembered an article I once read that had
-a visualization of a similar (possible identical) problem. Failing to find it again
-(if you remeber something like this, please tell me), I decided to make my own
-visualizations and perhaps try to gain new insight into how various sorting
-algorithms work simply through this type of random analysis.
+Note: A correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 
 ## Warning / Expectations
 
-As can probably be assumed form the title of this post, this post will be about
-analysis of sorting algorithms through a non-standard method. As such, the standard
-method using Big O notation might be useful to know before reading, but is not
-strictly neccessary as this will not contain any references to Big O after this.
-However, some familiarity with the various sorting algorithms is almost a neccessity.
-The implementation of  each of the algotihms is shown though, so with a quick read
-of wikipedia it should be possible to learn enough to follow if you are determined.
+The standard method of anlgorithmic analysis using Big O notation might be useful
+to know before reading, but is not strictly neccessary as this will not contain any
+references to Big O after this. However, some familiarity with the various sorting
+algorithms is almost a neccessity; there will be enough different algorithms covered
+that trying to understand all of the in one sitting might be challenging. However,
+the implementation of each of the algotihms is shown though and links to wikipedia
+are provided so it should be possible to learn enough to follow if you are determined.
 If you have taken any introductary CS classes that had a section on sorting algorithms
 you should be fine.
 
@@ -38,23 +68,35 @@ deep understanding.
 
 ## Histogram
 
-*_Likely to be gone in later edits_:*
-The visualization I remember and am trying to recreate is a histogram of initial
-positions in the array vs final positions in the array.
+Because we will be using randomness, a single input array could become many different
+output arrays. So we will need some kind of method to discribe the probablity distribution
+of the output.
 
+So we will be using a 2D histogram (think 2D array of probabilities) where each
+element `histogram[x][y]` is the probability of the element at `arr[x]` ending up
+at `arr[y]` after the algorithm finishes.
 
-*_Ignore the secondary histogram below all of the graphs, it will be gone in future versions_*
+And that will be displayed as an image with each pixel (or group of pixels)
+representing a element `h[x][y]` and using hue to represent its value. Purple will
+be the highest probabilities and red will be the lowest probabilities.
+
+**_Ignore the secondary histogram below all of the graphs, it will be gone in future versions_**
 
 For example, a histogram of an algorithm that does nothing looks like:
 
 ![Forward](images/forward.png)
 
+Each element has a 100% chance of staying where it is.
+
 And for a algorithm that reverses the array would look like:
 
 ![Backward](images/backward.png)
 
-It is fairly easy to generate a histogram (of size `n` by `n`) of a sort with a random comparator using a
-function as follows:
+Each element has a 100% chance of moving to `arr[n-1-x]`.
+
+
+These histograms can be constructed by running the algorithm `N` times and counting\
+how many times each element ends up in each location.
 
 ```
 function hist(n,sort){
@@ -71,12 +113,16 @@ function hist(n,sort){
 }
 ```
 
-And this will be displayed as an image with each pixel (or group of pixels)
-representing a element `h[x][y]` and using hue to represent its value.
 
-And thus we can see what Chome's implementation of Array.sort's histogram looks like.
+This can also generate a histogram of a blackbox such as Chrome's implementation of Array.sort.
+
+```
+hist(300,(arr,comp)=>arr.sort(comp));
+```
 
 ![Array.sort-300](images/Array.sort-300.png)
+
+You are not expected to understand the pattern in that yet, but by the end of the post you are.
 
 ## Array.sort
 
