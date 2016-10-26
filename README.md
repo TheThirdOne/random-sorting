@@ -1018,7 +1018,7 @@ Changing the cutoff for using insertion sort can perhaps help us understand why 
 
 |   n   |     20     |     30     |     40     |     50     |
 |-------|------------|------------|------------|------------|
-||![quick-insert3-20-100](images/quick-insert3-20-100.png)|![quick-insert3-30-100](images/quick-insert3-30-100.png)|![quick-insert3-40-100](images/quick-insert3-40-100.png)|![quick-insert3-50-100](images/quick-insert3-50-100.png)|
+||![quick-insert-20-100](images/quick-insert-20-100.png)|![quick-insert-30-100](images/quick-insert-30-100.png)|![quick-insert-40-100](images/quick-insert-40-100.png)|![quick-insert-50-100](images/quick-insert-50-100.png)|
 
 ## Final Words
 
