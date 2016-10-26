@@ -2,8 +2,8 @@
 ## Inspiration
 
 In [a tangential conversation](https://news.ycombinator.com/item?id=12568194) on
-Hacker News, RKoutnik figure out the problem with using code like
-`arr.sort(()=>Math.floor(Math.random()*3)-1)`.
+Hacker News, [RKoutnik](https://news.ycombinator.com/user?id=RKoutnik) figure out
+the problem with using code like `arr.sort(()=>Math.floor(Math.random()*3)-1)`.
 
 Essentially the code above says to randomly sort the array, but does so by randomizing
 comparison function. This does not make the output array's order completely random,
@@ -11,6 +11,8 @@ the order of the output array will largely depend on which sorting algorithm was
 
 Note: The correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 
+
+*_Likely to be gone in later edits:_*
 When I first read this conversation, I remembered an article I once read that had
 a visualization of a similar (possible identical) problem. Failing to find it again
 (if you remeber something like this, please tell me), I decided to make my own
@@ -20,20 +22,28 @@ algorithms work simply through this type of random analysis.
 ## Warning / Expectations
 
 As can probably be assumed form the title of this post, this post will be about
-analysis of sorting algorithms through a different method. As such, the standard
+analysis of sorting algorithms through a non-standard method. As such, the standard
 method using Big O notation might be useful to know before reading, but is not
 strictly neccessary as this will not contain any references to Big O after this.
 However, some familiarity with the various sorting algorithms is almost a neccessity.
 The implementation of  each of the algotihms is shown though, so with a quick read
 of wikipedia it should be possible to learn enough to follow if you are determined.
-
 If you have taken any introductary CS classes that had a section on sorting algorithms
 you should be fine.
 
+Code for all of the sorts will be included because knowing how the exact implementation
+details is essential to understanding the graphs we will be using. If you would
+prefer to skip the code sections, you should be mostly fine if you don't want a
+deep understanding.
+
 ## Histogram
 
+*_Likely to be gone in later edits_:*
 The visualization I remember and am trying to recreate is a histogram of initial
 positions in the array vs final positions in the array.
+
+
+*_Ignore the secondary histogram below all of the graphs, it will be gone in future versions_*
 
 For example, a histogram of an algorithm that does nothing looks like:
 
@@ -43,7 +53,8 @@ And for a algorithm that reverses the array would look like:
 
 ![Backward](images/backward.png)
 
-We can then write a function to run a random sort n times as follows:
+It is fairly easy to generate a histogram (of size `n` by `n`) of a sort with a random comparator using a
+function as follows:
 
 ```
 function hist(n,sort){
@@ -65,8 +76,6 @@ representing a element `h[x][y]` and using hue to represent its value.
 
 And thus we can see what Chome's implementation of Array.sort's histogram looks like.
 
-_Perhaps something about the secondary historgram in on the bottom if it stays in_
-
 ![Array.sort-300](images/Array.sort-300.png)
 
 ## Array.sort
@@ -75,12 +84,13 @@ The main sorting algorithm(s) that started this was Array.sort so it makes sense
 to show those histograms first. These will also be the most complicated graphs so
 it will show what we will build up to being able to understand.
 
-We will be looking at both the V8(Chrome/Webkit) and SpiderMonkey(Firefox) implementations
+We will be looking at both the [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine))(Chrome)
+and [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey)(Firefox) implementations
 of Array.sort
 
-Note: For these tests Chrome is _Version_; Firefox is _Version_
+Note: For these tests Chrome is *_Version as of final rendering_*; Firefox is  *_Version as of final rendering_*
 
-Note: for non-built in methods assume Chrome _Version_ was used, but it should
+Note: for non-built in methods assume Chrome  *_Version as of final rendering_* was used, but it should
 not change any results as the javascript sorts should perform the same.
 
 
@@ -89,15 +99,15 @@ not change any results as the javascript sorts should perform the same.
 |Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
 |Firefox|![FArray.sort-10](images/FArray.sort-10.png)|![FArray.sort-30](images/FArray.sort-30.png)|![FArray.sort-50](images/FArray.sort-50.png)|![FArray.sort-100](images/FArray.sort-100.png)|![FArray.sort-300](images/FArray.sort-300.png)|
 
-Note: Varying array lengths (n) are used shown because some of the features of the graph may be clearer at a lower resolution. Also for Chrome `n=10` vs `n=30` are very different graphs.
+Note: Varying array lengths `n` are used shown because some of the features of the graph may be clearer at a lower resolution, and for Chrome spefically, `n=10` vs `n=30` are very different graphs.
 
 Based simply on these histograms, can you guess which algorithm Chrome is using?
 If you can, that is very impressive; if you can't, it should become more clear
-as we continue and look at other algorithms.
+as we continue and look at known algorithms' graphs.
 
 ## Simple Sorts
 
-Here the simple sorts: Bubble sort, Insertion Sort and Selection sorts will provide
+Here the simple sorts: Bubble sort, Insertion Sort and Selection sort will provide
 the introduction to matching known sorts to their histograms. These sorts are quite
 simple and have relatively easy to understand graphs.
 
@@ -176,8 +186,9 @@ position for most elements, the edges are slightly more complicated). My display
 system is not accurate enough to see when `d > ~5`; so we can only see a slight
 change is distribution at the first and last elements.
 
+*_Needs to be reworked, too dismissive:_*
 Showing how that edge conditions works will be left as an exercise for the reader
-as the math is relatively simple, but too time consuming to detail here. _Not happy with this_
+as the math is relatively simple, but too time consuming to detail here.
 
 ### [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort)
 
@@ -211,12 +222,13 @@ than to have this type of pattern hold.
 
 Therfore if we change  `if(comp(arr[j],arr[k]) > 0){` to `if(comp(arr[j],arr[k]) >= 0){`,
 then the `~1/3` should change to `~2/3` and the behaviour at the end should sharpen
-_I don't like that word choice_.
+*_I don't like that word choice_*.
 
+*_Needs to be reworked, figure it out:_*
 I have not worked out the math for exactly where the cut off should be for the
 tradeoff between those two patterns, and am also unsure on how exactly the pattern
 arises aside from what I have stated above. If you think you understand it well
-please create an issue on github. _Not happy with this_
+please create an issue on github.
 
 ## Complex / Effecient Sorts
 
@@ -239,7 +251,7 @@ Heap Sort manipulates the array into a [heap](https://en.wikipedia.org/wiki/Heap
 is taken out and moved to the end of the unsorted array and the heap is reorganized
 to be a heap again.
 
-The implementation I made was as follows (slightly more complicated then neccasary as it allows working on a subarray):
+The implementation I made was as follows *_(TODO: use simplified code in sorts.js)_*:
 
 ```
 function heapSort(arr,comp){
@@ -293,17 +305,19 @@ part and the for loop part.
 |---------------|------------|
 |![Heapify](images/heapify-300.png)|![Heap Loop](images/heap-loop-300.png)|
 
+*_TODO: would prefer to start with compose up front, maybe in the intro the the new section_*
 From this it is quite clear that `heapify` is the cause of the multiple lines and
 the loop causes the crosshatching pattern. But how do we know that the Loop image
 is an accurate representation of what Heap Sort is doing; the setup to it is commented
-out so how can its graph be valid on its own. _would prefer to start with compose up front, maybe in the intro the the new section_
+out so how can its graph be valid on its own.
 
 We can answer that concern be trying to reassemble the original heap sort from the
 peices. We simply need to find out how to compose one graph on top of another.
 
+*_Needs to be reworked, too dismissive:_*
 This "compose" operation can just be thought of as a matrix multiplication. The
 exact reason why "compose" is a matrix multiplication is not very important or interesting
-so it will be left as an exercise for the reader. _I would like to be less dissmisive here, but I do not want to even try to explain that_
+so it will be left as an exercise for the reader.
 
 As javascript does not have a matrix multiplication built in and I don't want to
 bring in a library. I implemented it as:
@@ -346,9 +360,16 @@ width children.
 |----------|-----------|---------|
 |![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/ternary-heap-50.png)|![4ary Heap Sort](images/4ary-heap-50.png)|
 
-The loop is a little harder to come to a good understanding of. There are still a
-few lines like the ones in heapify, but they are overshadowed by the pattern on the
-top of the main line. The pattern on the left is from _cause_.
+The loop is a little harder to come to a good understanding of. The pattern on the
+left is from moving the first most element to the end of the array in each iteration.
+This causes `arr[0]` to always end up in `arr[n-1]`; subsequent iterations are not
+that clear cut though because `siftDown` is called.  There are still a few lines
+like the ones in heapify, but they are overshadowed by the pattern on the top of
+the main line which leads to the crosshatching pattern in the heap sort.
+
+Looking at heap sort as a whole with this new unstanding, may emphasize and explain
+the pattern in the bottom left. The exact reason the lines and the crosshatching
+patterns arise should also be much clearer.
 
 ### [Merge Sort](https://en.wikipedia.org/wiki/Merge_sort)
 
@@ -357,7 +378,7 @@ Merge sort merges (sorted) subarrays until it has merged the entire array.
 There are two main ways of implementing merge sort: bottom-up and top-down. Originally
 I had implemented it top-down (because its slightly easier that way), but implemented
 it bottom-up to use the compose analysis on it (it is easier to separate analysis
-with loops rather than recursion and because it is slightly more efficient, the
+with loops rather than recursion) and because it is slightly more efficient (the
 browsers were more likely to implement it this way).
 
 My bottom-up implementation I made was as follows:
@@ -423,11 +444,34 @@ Note: not all `w`s are shown for sake of space.
 |-------|------------|------------|-----------|-----------|
 |mergeStep(w)|![merge-step-1](images/merge-step-1.png)|![merge-step-4](images/merge-step-4.png)|![merge-step-32](images/merge-step-32.png)|![merge-step-128](images/merge-step-128.png)|
 
-It is not quite clear how these build the final. _But more analysis_
+These should make sense; each loop is just merging subarrays of length `w` into
+subarrays of length `2w`. And each merge looks like the two streaks.
+
+To better understand the merge pattern though, lets look only at the `w=128` graph.
+`arr[0]` and `arr[128]` are both likely to end up around `arr[0]` which accounts
+for the start of the two streaks. Each element afterwards becomes more uncertain
+and more likely to end up towards the end of the array. The vertical cut off of
+the first streak is just the boundary between the first subarray and the second.
+and the diagonal cutoff for the second is because elements in the second array
+cannot be merged behind their initial position because the rest of the second array
+needs to fit there.
+
+It is not quite clear how these build the final so lets compose some them in reverse
+order to try to better understand (Doing it in forward order will just give us things
+that look like merge sort).
+
+IE rather than composing like `((AB)C)D` and looking at each intermediate step. We
+can do `A(B(CD))` and look at each itermediate step. This is a valid method because
+matrix multiplication is [associative](https://en.wikipedia.org/wiki/Associative_property).
+
+*_TODO: table_*
+
+And that explians why the pattern in merge sort arises just from the graph of merge.
+
 
 #### Conection to Array.sort
+*_Very not happy with this section, may just omit it and leave it for the later section_*
 
-_Very not happy with this section_
 One important thing ot notice is that Merge Sort looks very similar to what Firefox's
 implementation looked like. There is a certain "logrithmicness" present in both.
 In the Firefox implementation it is more jagged, but it is clear that somehow Firefox
@@ -477,9 +521,26 @@ function partition(arr,comp,lo,hi){
 }
 ```
 
-_Analysis of Quick Sort_
+Quick sort does a pretty good job of being hard to understand. We can't use composition
+easily because it is recursive (with dependence on the comparator) and is generally
+quite even (there is only one major easy patterns to identify).
+
+The right edge is where we selected the pivot from and is, as a result, different
+from the rest. Because of the way it was implemented, where the pivot ended up is
+where the first division happened. Looking at the graph, we can see it is most likely
+to be around `arr[n/3]` with a pretty smooth distribution to both sides.
+
+That pattern alone I believe is responsible for most of the pattern of the graph.
+In each recursive call, the location of the last index changes, but the pattern around
+it stays the same.
+
+*_Would prefer a better way to not go into this:_*
+A more complex attempt at composition could give a more rigorous and meaningful analysis,
+but that would be a somewhat involved process and may not make it any clearer. So for
+the sake of time, it will be ommited.
 
 #### Connection to Array.Sort
+*_Very not happy with this section, may just omit it and leave it for the later section_*
 
 While it is less clear that Chrome's implementation involves a quicksort, there
 is definitely a evenness that is not apparrent in any other major sort, so Chrome
