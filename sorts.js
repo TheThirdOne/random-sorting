@@ -51,7 +51,7 @@ function heapSort(arr,comp){
     // The 0th element of a heap is the largest so move it to the top.
     [arr[0],arr[i]] = [arr[i],arr[0]];
     // The 0th element is no longer the largest, restore the heap property
-    siftDown(arr, comp, 0, 0, i-1);
+    siftDown(arr, comp, 0);
   }
 }
 
@@ -66,7 +66,7 @@ function heapify(arr, comp){
 }
 
 // Make sure the root of the heap satifies the heap property,
-function siftDown(arr, comp, root, start, end){
+function siftDown(arr, comp, root){
   // Stop if you reach a leave node
   while(2*root + 1 < arr.length){
     let child = 2*root+1;
@@ -391,9 +391,9 @@ function partition3(arr,comp,lo,hi){
     } // if c === 0, do nothing, it is in the right place
   }
   // state of sub array:
-  //  [lo,eqlo) is less than pivot
-  //  [eqlo,eqhi] is equal to pivot
-  //  (eqhi,hi) is greater than pivot
+  //  [lo:eqlo) is less than pivot
+  //  [eqlo:eqhi] is equal to pivot
+  //  (eqhi:hi) is greater than pivot
   return [eqlo,eqhi];
 }
 

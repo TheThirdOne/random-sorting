@@ -1,10 +1,16 @@
 function hist(n,sort){
+  // Make an empty nxn array and empty array
   var h = (new Array(n).fill(0)).map(()=>(new Array(n)).fill(0));
   var arr = (new Array(n)).fill(0);
+  
+  var randomComparator = ()=>Math.floor(Math.random()*3-1);
+  
+  // Run the sort 100000 times
   for(var i = 0; i < 100000; i++){
-    arr = arr.map((a,b)=>b); //convert to ascending array
-    sort(arr,()=>Math.floor(Math.random()*3-1))
+    arr = arr.map((_,i)=>i); // convert each element into its index
+    sort(arr,randomComparator);
     for(var k = 0; k < n;k++){
+      // Use the initial index (the value of the cell) and the final index (k) to update the histogram
       h[arr[k]][k]++;
     }
   }
