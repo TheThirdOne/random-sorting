@@ -1,10 +1,10 @@
 // Simple Algorithms
 // Bubble, Insertion, Selection
 function bubbleSort(arr,comp){
-  for(var i = arr.length-1; i > 0;i--){        // The top j elements are sorted after j loops
-    for(var k = 0; k < i; k++){                // Bubble from 0 to i
-      if(comp(arr[k],arr[k+1]) > 0){           // if arr[k] > arr[k+1]
-        [arr[k],arr[k+1]] = [arr[k+1],arr[k]]; //   swap arr[k] and arr[k+1]
+  for(let i = arr.length-1; i > 0; i--){       // The top j elements are sorted after j loops
+    for(let k = 0; k < i; k++){                // Bubble from 0 to i
+      if(comp(arr[k],arr[k+1]) > 0){           // If arr[k] > arr[k+1]
+        [arr[k],arr[k+1]] = [arr[k+1],arr[k]]; //   Swap arr[k] and arr[k+1]
       }
     }
   }
@@ -13,13 +13,13 @@ function bubbleSort(arr,comp){
 
 function insertionSort(arr,comp){
   // Build a sorted array 1 element at a time.
-  for(var i = 1; i < arr.length;i++){
+  for(let i = 1; i < arr.length; i++){
     // Insert into the sorted array arr[0:i]
-    for(var k = i; k > 0; k--){
-      if(comp(arr[k-1],arr[k]) > 0){          // if arr[k-1] > arr[k]
-        [arr[k],arr[k-1]] = [arr[k-1],arr[k]];//   swap arr[k-1] and arr[k]
+    for(let k = i; k > 0; k--){
+      if(comp(arr[k-1],arr[k]) > 0){          // If arr[k-1] > arr[k]
+        [arr[k],arr[k-1]] = [arr[k-1],arr[k]];//   Swap arr[k-1] and arr[k]
       }else{
-        //arr[0:i+1] is sorted and its ready for the next interation
+        // arr[0:i+1] is sorted and is ready for the next interation
         break;
       }
     }
@@ -28,10 +28,10 @@ function insertionSort(arr,comp){
 
 function selectionSort(arr,comp){
   // Build a sorted array 1 element at a time.
-  for(var i = 0; i < arr.length;i++){
+  for(let i = 0; i < arr.length; i++){
     // Select the smallest element in arr[i:n-1]
     let j = i;
-    for(var k = i+1; k < arr.length; k++){
+    for(let k = i+1; k < arr.length; k++){
       if(comp(arr[j],arr[k]) > 0){
         j = k;
       }
@@ -43,22 +43,21 @@ function selectionSort(arr,comp){
 
 // Effecient Algorithms
 // Heap, Merge, Quick
-
 function heapSort(arr,comp){
   // Turn arr into a heap
-  heapify(arr, comp);
-  for(var i = end-1; i > 0;i--){
+  heapify(arr,comp);
+  for(let i = end-1; i > 0; i--){
     // The 0th element of a heap is the largest so move it to the top.
     [arr[0],arr[i]] = [arr[i],arr[0]];
-    // The 0th element is no longer the largest, restore the heap property
-    siftDown(arr, comp, 0);
+    // The 0th element is no longer the largest; restore the heap property
+    siftDown(arr,comp,0);
   }
 }
 
 // Convert the array into a binary heap
-function heapify(arr, comp){
-  // Arr[n/2-1:n-1] already satisfies the heap property because they are the leaves.
-  for(var i = Math.floor((arr.length-2)/2); i >= 0; i--){
+function heapify(arr,comp){
+  // arr[n/2-1:n-1] already satisfies the heap property because they are the leaves.
+  for(let i = Math.floor((arr.length-2)/2); i >= 0; i--){
     // Restore the heap property for i
     siftDown(arr, comp, i);
   }
@@ -66,26 +65,26 @@ function heapify(arr, comp){
 }
 
 // Make sure the root of the heap satifies the heap property,
-function siftDown(arr, comp, root){
+function siftDown(arr,comp,root){
   // Stop if you reach a leave node
-  while(2*root + 1 < arr.length){
+  while(2*root+1 < arr.length){
     let child = 2*root+1;
     let tmp = root;
     
-    // if its child is greater than it, plan to switch them
+    // If its child is greater than it, plan to switch them
     if(comp(arr[child],arr[tmp])>0){
       tmp = child;
     }
-    // if the second child is the greatest, plan to switch it
+    // If the second child is the greatest, plan to switch it
     if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
       tmp = child + 1;
     }
     
-    if(tmp  == root){
-      //if the root is the biggest, your are done.
+    if(tmp == root){
+      // If the root is the biggest, you are done.
       return;
     }else{
-      // if a child is greater than the root, swap them and repeat with the index of the child
+      // If a child is greater than the root, swap them and repeat with the index of the child
       [arr[root],arr[tmp]] = [arr[tmp],arr[root]];
       root = tmp;
     }
@@ -99,19 +98,19 @@ function mergeSort(arr,comp){
   var a2 = new Array(arr.length);
   
   // Merge all non-overlapping subarrays of width w for doubling w until w > n
-  for(var w = 1; w < arr.length; w *= 2){
-    for(var lo = 0; lo < arr.length; lo += 2*w){
+  for(let w = 1; w < arr.length; w *= 2){
+    for(let lo = 0; lo < arr.length; lo += 2*w){
       // If hi > n, just copy a1[lo:n-1] to a2[lo:n-1]
-      var hi = lo + w;
+      let hi = lo+w;
       if (hi >= arr.length) {
           copy(a2, a1, lo, arr.length-1);
           break;
       }
       // Merge a1[lo:hi-1] and a1[hi:max(hi+w,n-1)] into a2[lo:max(hi+w,n-1)]
-      var top = Math.min(lo + 2*w,arr.length);
-      merge(a2, a1, lo, hi, top-1, comp);
+      var top = Math.min(lo+2*w,arr.length);
+      merge(a2,a1,lo,hi,top-1,comp);
     }
-    // swap which array we are copying from
+    // Swap which array we are copying from
     [a1,a2] = [a2,a1];
   }
   // If we the sorted data is in the copy, move it back
@@ -122,7 +121,7 @@ function mergeSort(arr,comp){
 
 function merge(a1,a2,lo,hi,top,comp){
   var j = hi;
-  for(var i = lo; i <= top; i++){
+  for(let i = lo; i <= top; i++){
     if(lo >= hi){                 // if the first subarray is empty
       a1[i] = a2[j];
       j++;
@@ -142,7 +141,7 @@ function merge(a1,a2,lo,hi,top,comp){
 }
 
 function copy(a1,a2,lo,hi){
-  for(var i = lo; i <= hi; i++){
+  for(let i = lo; i <= hi; i++){
     a1[i] = a2[i];
   }
 }
@@ -152,9 +151,9 @@ function quickSort(arr,comp){
   return quickSortRecurse(arr,comp,0,arr.length-1);
 }
 
-//quicksort on a slice of the array
+// Quicksort on a slice of the array
 function quickSortRecurse(arr,comp,lo,hi){
-  // if lo >= hi, its sorted
+  // If lo >= hi, its sorted
   if(lo < hi){
     // Partition arr into (arr[lo:pivot-1] are < arr[pivot]) & (arr[pivot+1:hi] are >= arr[pivot])
     let pivot = partition(arr,comp,lo,hi);
@@ -169,7 +168,7 @@ function partition(arr,comp,lo,hi){
   var pivot = arr[hi];
   
   var k = lo;
-  for(var i = lo; i < hi;i++){
+  for(let i = lo; i < hi;i++){
     // If the element is less than pivot, move it into arr[lo:k]
     if(comp(arr[i],pivot) < 0){
       [arr[i],arr[k]] = [arr[k],arr[i]];
@@ -188,16 +187,16 @@ function partition(arr,comp,lo,hi){
 
 // Runs Insertion sort on 3 wide sub arrays along the entire array
 function boundedInsertionSort(arr,comp){
-  for(var i = 0; i < arr.length; i+=3){
+  for(let i = 0; i < arr.length; i+=3){
     insertCustom(arr,comp,i,1,Math.min(arr.length,i+3));
   }
 }
 
-// insertion sort with custom increment, initial position and end position
-// used for shell sort, merge-insert sort and quick-insert sort
+// Insertion sort with custom increment, initial position and end position
+// Used for shell sort, merge-insert sort and quick-insert sort
 function insertCustom(arr,comp,start,increment,end){
-  for(var i = start+increment; i < end; i+=increment){
-    for(var k = i; k - increment >= start; k -= increment){
+  for(let i = start+increment; i < end; i+=increment){
+    for(let k = i; k-increment >= start; k -= increment){
       if(comp(arr[k-increment],arr[k]) > 0){
         let temp = arr[k];
         arr[k]   = arr[k-increment];
@@ -219,8 +218,8 @@ function mergeInsertSort(arr,comp){
   var a2 = new Array(arr.length)
   
   // w starts at 3 now because it each every 3 element subarray is already sorted.
-  for(var w = 3; w < arr.length; w *= 2){
-    for(var lo = 0; lo < arr.length; lo += 2*w){
+  for(let w = 3; w < arr.length; w *= 2){
+    for(let lo = 0; lo < arr.length; lo += 2*w){
       var hi = lo + w;
       if (hi >= arr.length) {
           copy(a2, a1, lo, arr.length-1);
@@ -254,9 +253,7 @@ function mergeInsertSortOpt(arr,comp){
       var top = Math.min(lo + 2*w,arr.length);
       mergeOpt(a2, a1, lo, hi, top-1, comp);
     }
-    var s = a1;
-    a1 = a2;
-    a2 = s;
+    [a1,a2] = [a2,a1];
   }
   if(a1 !== arr){
     copy(arr,a1,0,arr.length-1);
@@ -268,7 +265,7 @@ function mergeOpt(a1,a2,lo,hi,top,comp){
   var j = hi;
   // Check to see if they are already merged
   if(comp(a2[lo],a2[j])>0){
-    for(var i = lo; i <= top; i++){
+    for(let i = lo; i <= top; i++){
       if(lo >= hi){
         a1[i] = a2[j];
         j++;
@@ -291,17 +288,14 @@ function mergeOpt(a1,a2,lo,hi,top,comp){
   }
 }
 
-
-// Todo: include sub-sorts used in analysis
-
 // Chrome Analysis
 function quickInsertSort(arr,comp){
   return quickInsertSortRecurse(arr,comp,0,arr.length-1);
 }
 
 function quickInsertSortRecurse(arr,comp,lo,hi){
-  if(lo + 10 < hi){
-    // same as before, but with a new partition
+  if(lo+10 < hi){
+    // Same as before, but with a new partition
     let pivot = partition2(arr,comp,lo,hi);
     quickInsertSortRecurse(arr,comp,lo,pivot-1);
     quickInsertSortRecurse(arr,comp,pivot+1,hi);
@@ -316,7 +310,7 @@ function partition2(arr,comp,lo,hi){
   
   //Pretty much the same as before, but with slightly different bounds
   var k = lo+1;
-  for(var i = lo+1; i < hi-1;i++){
+  for(let i = lo+1; i < hi-1;i++){
     if(comp(arr[i],pivot) < 0){
       [arr[i],arr[k]] = [arr[k],arr[i]];
       k++;
@@ -345,7 +339,7 @@ function setupPivot(arr,comp,lo,mid,hi){
       [b,c]=[c,b];
     }
   }
-  //put the top and bottom values back
+  // Put the top and bottom values back
   arr[lo] = a;
   arr[hi] = c
   
@@ -360,7 +354,7 @@ function quickInsertSort2(arr,comp){
 }
 
 function quickInsertSort2Recurse(arr,comp,lo,hi){
-  if(lo + 10 < hi){
+  if(lo+10 < hi){
     let [a,b] = partition3(arr,comp,lo,hi);
     quickInsertSort2Recurse(arr,comp,lo,a-1);
     quickInsertSort2Recurse(arr,comp,b+1,hi);
@@ -374,26 +368,23 @@ function partition3(arr,comp,lo,hi){
   
   var eqlo = lo+1, eqhi = hi-1;
   for(let i = lo+2; i <= eqhi;i++){
-    var c = comp(arr[i],pivot);
+    let c = comp(arr[i],pivot);
     if(c < 0){
-      // move arr[i] below the equal range
-      let t = arr[eqlo];
-      arr[eqlo] = arr[i];
-      arr[i] = t;
+      // Move arr[i] below the equal range
+      [arr[eqlo],arr[i]] = [arr[i],arr[eqlo]];
       eqlo++;
     }else if(c > 0){
-      // move arr[i] above the equal range
-      let t = arr[eqhi];
-      arr[eqhi] = arr[i];
-      arr[i] = t;
+      // Move arr[i] above the equal range
+      [arr[eqhi],arr[i]] = [arr[i],arr[eqhi]];
       eqhi--;
-      i--; //the value at arr[i] has not yet been processed so stall the loop
-    } // if c === 0, do nothing, it is in the right place
+      // The value at arr[i] has not yet been processed so stall the loop
+      i--;
+    } // If c === 0, do nothing, it is in the right place
   }
-  // state of sub array:
-  //  [lo:eqlo) is less than pivot
+  // State of sub array:
+  //  [lo:eqlo)   is less than pivot
   //  [eqlo:eqhi] is equal to pivot
-  //  (eqhi:hi) is greater than pivot
+  //  (eqhi:hi)   is greater than pivot
   return [eqlo,eqhi];
 }
 
