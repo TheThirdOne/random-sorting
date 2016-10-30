@@ -12,7 +12,6 @@ They would no be used to if the code was known.
 If we are not allowed to inspect the code and only have access to a function, we
 can only really abuse the input. If the conditions of the algorithm are met, correctness
 is guaranteed for all algorithms. Generally, sorting algorithms require [total order](https://en.wikipedia.org/wiki/Total_order)
-
 for all elements of the array. But by not meeting all the conditions of the algorithms,
 we can tease out extra information.
 
@@ -35,9 +34,7 @@ The conditions we will be breaking are:
 This will be done by defining a random comparator.
 
 ```
-
   c(x,y) = uniformly randomly select from [-1,0,1]
-
 ```
 
 ## Inspiration
@@ -70,6 +67,9 @@ details is essential to understanding the graphs we will be using. If you would
 prefer to skip the code sections, you should be mostly fine if you don't want a
 deep understanding.
 
+This is a fairly lengthy read; it should take around an hour to read thoroughly
+if you know most of the pure sorting algorithms.
+
 ## Histogram
 
 Because we will be using randomness, a single input array could become  one of many
@@ -82,7 +82,15 @@ at `arr[y]` after the algorithm finishes.
 
 And that will be displayed as an image with each pixel (or group of pixels)
 representing an element `h[x][y]` and using hue to represent its value. Purple will
-be the highest probabilities and red will be the lowest probabilities.
+be the highest probabilities and red will be the lowest probabilities. One important
+thing to note is that the colors are only relevant to a single graph. The same color
+on two different graphs can represent very different probabilities. This is ok for
+this application because we will only be doing qualitative analysis on a single
+graph at a time.
+
+The full scale looks like:
+
+![Scale](images/scale.png)
 
 **_Ignore the secondary histogram below all the graphs, it will be gone in future versions_**
 
@@ -274,8 +282,7 @@ continues down the line until the end of the array was more likely to be picked
 than to have this type of pattern hold.
 
 Therefore if we change  `if(comp(arr[j],arr[k]) > 0){` to `if(comp(arr[j],arr[k]) >= 0){`,
-then the `~1/3` should change to `~2/3` and the behaviour at the end should sharpen
-*_I don't like that word choice_*.
+then the `~1/3` should change to `~2/3` and the behaviour at the end should narrow.
 
 *_Needs to be reworked, figure it out:_*
 I have not worked out the math for exactly where the cut off should be for the
@@ -309,7 +316,7 @@ The implementation I made was as follows:
 function heapSort(arr,comp){
   // Turn arr into a heap
   heapify(arr,comp);
-  for(let i = end-1; i > 0; i--){
+  for(let i = arr.length-1; i > 0; i--){
     // The 0th element of a heap is the largest so move it to the top.
     [arr[0],arr[i]] = [arr[i],arr[0]];
     // The 0th element is no longer the largest; restore the heap property
@@ -339,7 +346,7 @@ function siftDown(arr,comp,root){
       tmp = child;
     }
     // If the second child is the greatest, plan to switch it
-    if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
+    if(child+1 < arr.length && comp(arr[child+1],arr[tmp]) > 0){
       tmp = child + 1;
     }
     
@@ -537,19 +544,6 @@ matrix multiplication is [associative](https://en.wikipedia.org/wiki/Associative
 
 And that explains why the pattern in merge sort arises just from the graph of merge.
 
-#### Connection to Array.sort
-
-*_Very not happy with this section, may just omit it and leave it for the later section_*
-
-One important thing to notice is that Merge Sort looks very similar to what Firefox's
-implementation looked like. There is a certain "logrithmicness" present in both.
-In the Firefox implementation it is more jagged, but it is clear that somehow Firefox
-is using merge sort.
-
-|       Merge Sort      |   Array.sort (FireFox)    |
-|-----------------------|---------------------------|
-|![Merge Sort](images/merge-300.png)|![Array.sort](images/FArray.sort-300.png)|
-
 ### [Quick Sort](https://en.wikipedia.org/wiki/Quick_sort)
 
 Quick sort picks a pivot value (this is the largest difference between different
@@ -609,19 +603,10 @@ That pattern alone I believe is responsible for most of the pattern of the graph
 In each recursive call, the location of the last index changes, but the pattern around
 it stays the same.
 
-*_Would prefer a better way to not go into this:_*
+**_Would prefer a better way to not go into this, but it seems like it will be neccessary as this section is really short otherwise:_**
 A more complex attempt at composition could give a more rigorous and meaningful analysis,
 but that would be a somewhat involved process and may not make it any clearer. So for
 the sake of time, it will be omitted.
-
-#### Connection to Array.Sort
-
-*_Very not happy with this section, may just omit it and leave it for the later section_*
-
-While it is less clear that Chrome's implementation involves a quicksort, there
-is definitely a evenness that is not apparent in any other major sort, so Chrome
-must be using quicksort somehow. If you are unconvinced, don't worry I will have
-a more convincing argument as to why Chrome must be using Quick Sort later.
 
 ## Figuring out the implementations of Array.Sort
 
@@ -636,6 +621,11 @@ Just a quick reminder/reference, this is what the graphs for Firefox looked like
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
 |Firefox|![FArray.sort-10](images/FArray.sort-10.png)|![FArray.sort-30](images/FArray.sort-30.png)|![FArray.sort-50](images/FArray.sort-50.png)|![FArray.sort-100](images/FArray.sort-100.png)|![FArray.sort-300](images/FArray.sort-300.png)|
+
+Out of the three main effecient sorting algorithms, which is most similar to these
+graphs? Heap and quicksort are clearly very different. However, merge sort has a
+sort of swept pattern that looks kind of like it; the intermediate steps for merge
+also look similar so it seems like a good bet.
 
 `n=10` shows an interesting pattern along the diagonal. It looks very similar to
 insertion sort, but is restricted to 3x3 areas of the graph.
@@ -805,28 +795,6 @@ Reminder of the Graphs
 |-------|------------|------------|------------|-------------|-------------|
 |Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
 
-#### Verification that QuickSort is involved
-
-One thing that may have seemed speculative in earlier analysis is that chrome has
-to somehow use Quick Sort.
-
-We can at least somewhat confirm this by showing that Chrome's Array.sort is [instable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).
-
-We can't prove stability without testing all possible inputs (_Some proof for this_),
-but we can show instability. The following test fails for chrome.
-
-```
-var a = [[5,1],[5,2],[4,3],[4,4],[3,5],[3,6],[2,7],[2,8],[1,9],[1,10]];
-a.sort((a,b)=>a[0]=b[0]);
-
-// a is now [[1,10],[1,9],[1,8],[1,7],[1,6],[1,5],[1,4],[1,3],[1,2],[1,1]]
-```
-
-`[1,10]` and `[1,9]` swapped places and thus we know that it is not stable so, of
-efficient, pure algorithms, only heap sort and quick sort are unstable. As it should
-be clear Array.sort is not using heapsort for the top level sorting algorithm, quick
-sort must be the major algorithm in the implementation.
-
 #### Insertion sort is involved
 
 For `n=10` we can see that it is very similar if not identical to insertion Sort.
@@ -842,6 +810,31 @@ As we can see, for `n=5` and `n=10`, Array.sort looks indistinguishable from ins
 sort. But for `n=12` and `n=15`, the patterns diverge. We can conclude from this that,
 at least for first iteration (my guess is that its true for every iteration), if
 `n <= 10`, insertion sort is being used instead of Quick Sort.
+
+#### Quicksort is the main sort.
+
+It is not very clear what main algorithm Chrome is using. It doesn't look very much
+like any of the three. To me, it looks most like quicksort, but we would like to
+be more sure.
+
+We can at least somewhat confirm this by showing that Chrome's Array.sort is [instable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability).
+
+We can't prove stability without testing all possible inputs (Proving stability
+of a black box algorithm is not possible, but if it was we would have used this
+to confirm Merge sort for firefox), but we can show instability. The following test
+for stability fails for chrome (because insertion sort is stable and is used for n < 10, we had to have an array longer than 10 elements).
+
+```
+var a = [[5,1],[5,2],[4,3],[4,4],[3,5],[3,6],[2,7],[2,8],[1,9],[1,10],[0,11],[0,12]];
+a.sort((a,b)=>a[0]-b[0]);
+
+// a is now [0,12],[0,11],[1,10],[1,9],[2,7],[2,8],[3,6],[3,5],[4,4],[4,3],[5,2],[5,1]
+```
+
+`[1,10]` and `[1,9]` swapped places and thus we know that it is not stable so, of
+efficient, pure algorithms, only heap sort and quick sort are instable. As it should
+be clear Array.sort is not using heapsort for the top level sorting algorithm, quick
+sort must be the major algorithm in the implementation.
 
 #### Partitioning algorithm
 
@@ -892,7 +885,7 @@ function quickInsertSort(arr,comp){
 }
 
 function quickInsertSortRecurse(arr,comp,lo,hi){
-  if(lo + 10 < hi){
+  if(lo+10 < hi){
     // Same as before, but with a new partition
     let pivot = partition2(arr,comp,lo,hi);
     quickInsertSortRecurse(arr,comp,lo,pivot-1);
@@ -933,13 +926,13 @@ function setupPivot(arr,comp,lo,mid,hi){
   if(comp(a,c) >= 0){
     [a,b,c]=[c,a,b];
   }else{
-    if (comp(b, c)) {
+    if (comp(b, c) > 0) {
       [b,c]=[c,b];
     }
   }
   // Put the top and bottom values back
   arr[lo] = a;
-  arr[hi] = c
+  arr[hi] = c;
   
   // And use the median as the pivot
   [arr[mid],arr[hi-1]] = [arr[hi-1],b];

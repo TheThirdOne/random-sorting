@@ -36,14 +36,14 @@ function heapLoop(arr,comp){
     let t = arr[i];
     arr[i] = arr[0];
     arr[0] = t;
-    siftDown(arr, comp, 0, 0, i-1)
+    siftDown(arr, comp, 0, 0, i-1);
   }
 }
 
 // Insert Merge pieces
 function mergeStep(w){
   return function(arr,comp){
-    var tmp = new Array(arr.length)
+    var tmp = new Array(arr.length);
     for(var lo = 0; lo < arr.length; lo += 2*w){
       var hi = lo + w;
       if (hi >= arr.length) {
@@ -113,7 +113,17 @@ function daryHeap(d){
   };
 }
 
-
+function scale(){
+  var c = document.createElement('canvas');
+  c.width = 300;
+  c.height = 100;
+  var ctx = c.getContext('2d');
+  for(var i = 0; i < 300; i++){
+    ctx.fillStyle = 'hsl(' + i + ',100%,50%)'
+    ctx.fillRect(i,0,1,100);
+  }
+  return c.toDataURL();
+}
 var jsSorts = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],                                       // Introduction
   ...standard(bubbleSort,'bubble'),...standard(insertionSort,'insertion'),...standard(selectionSort,'selection'), // Simple algorithms
   ...standard(heapSort, 'heap'),   ...standard(mergeSort,    'merge'), ...standard(quickSort,    'quick'),        // Effecient algorithms
@@ -147,8 +157,11 @@ var firefoxSorts = [
     ...standard((a,b)=>a.sort(b),'FArray.sort') //general cases
   ];
 
-//TODO: compose(heapify,heaploop)
-
+function composeHeap(m,disp){
+  var heapify = m.get('heapify-300');
+  var loop    = m.get('heap-loop-300');
+  disp(graph(compose(heapify,loop)),'composed-heap-300');
+}
 
 function composeMergeStep(m,disp){
   var start = m.get('merge-step-1');

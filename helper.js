@@ -7,6 +7,8 @@ function hist(n,sort){
   
   // Run the sort 100000 times
   for(var i = 0; i < 100000; i++){
+    if(i === 50000)
+      console.log('halfway');
     arr = arr.map((_,i)=>i); // convert each element into its index
     sort(arr,randomComparator);
     for(var k = 0; k < n;k++){
@@ -58,12 +60,10 @@ var sum = (a)=>a.reduce((a,b)=>a+b,0);
 function graph(hist){
   var c = document.createElement('canvas');
   c.width = 300;
-  c.height = 400;
+  c.height = 300;
   var ctx = c.getContext('2d');
   var m = max(0,hist);
   var a = 300/hist.length, b = 300/hist[0].length;
-  
-
   
   var hist2 = computeHist2(hist);           //computes histogram of pixels hues vs count
   var [lower,upper] = bounds(hist2);        //computes bounds such that 98% of pixels don't get clipped
@@ -82,11 +82,11 @@ function graph(hist){
     }
   }
   
-  m = max(0,hist3);
+  /*m = max(0,hist3);
   for(var i = 0; i < 360; i++){
     ctx.fillStyle = 'hsl(' + i + ',100%,50%)'
     ctx.fillRect(i,400-Math.floor(100*hist3[i]/m),1,Math.floor(100*hist3[i]/m));
-  }
+  }*/
   return c.toDataURL();
 }
 

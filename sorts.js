@@ -46,7 +46,7 @@ function selectionSort(arr,comp){
 function heapSort(arr,comp){
   // Turn arr into a heap
   heapify(arr,comp);
-  for(let i = end-1; i > 0; i--){
+  for(let i = arr.length-1; i > 0; i--){
     // The 0th element of a heap is the largest so move it to the top.
     [arr[0],arr[i]] = [arr[i],arr[0]];
     // The 0th element is no longer the largest; restore the heap property
@@ -76,7 +76,7 @@ function siftDown(arr,comp,root){
       tmp = child;
     }
     // If the second child is the greatest, plan to switch it
-    if(child+1 <= end && comp(arr[child+1],arr[tmp])>0){
+    if(child+1 < arr.length && comp(arr[child+1],arr[tmp]) > 0){
       tmp = child + 1;
     }
     
@@ -335,13 +335,13 @@ function setupPivot(arr,comp,lo,mid,hi){
   if(comp(a,c) >= 0){
     [a,b,c]=[c,a,b];
   }else{
-    if (comp(b, c)) {
+    if (comp(b, c) > 0) {
       [b,c]=[c,b];
     }
   }
   // Put the top and bottom values back
   arr[lo] = a;
-  arr[hi] = c
+  arr[hi] = c;
   
   // And use the median as the pivot
   [arr[mid],arr[hi-1]] = [arr[hi-1],b];
