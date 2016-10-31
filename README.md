@@ -302,6 +302,84 @@ we can start to expect to see some similarities to the implementations of Array.
 |Merge|![merge-10](images/merge-10.png)|![merge-30](images/merge-30.png)|![merge-50](images/merge-50.png)|![merge-100](images/merge-100.png)|![merge-300](images/merge-300.png)|
 |Quick|![quick-10](images/quick-10.png)|![quick-30](images/quick-30.png)|![quick-50](images/quick-50.png)|![quick-100](images/quick-100.png)|![quick-300](images/quick-300.png)|
 
+### Composition of independent sub-parts
+
+In order to deaply understand these more complex algorithms, we are going to separate
+them into independent parts. Steps are considered independent if the output from
+the comparator used in one does not affect the other.
+
+For example, bubbleSort is fully separable, each iteration of the two outside loops
+does not depend on the comparator. It could be equivilantly be written out as a
+bunch of independent ifs.
+
+```
+function bubbleSort(arr,comp){
+  for(let i = arr.length-1; i > 0; i--){       // The top j elements are sorted after j loops
+    for(let k = 0; k < i; k++){                // Bubble from 0 to i
+      if(comp(arr[k],arr[k+1]) > 0){           // If arr[k] > arr[k+1]
+        [arr[k],arr[k+1]] = [arr[k+1],arr[k]]; //   Swap arr[k] and arr[k+1]
+      }
+    }
+  }
+}
+```
+
+Alternatively, the inner loop of selection sort is not separable. `j` depends on
+the result of a comparison and therefore is inseparable.
+
+```
+function selectionSort(arr,comp){
+  // Build a sorted array 1 element at a time.
+  for(let i = 0; i < arr.length; i++){
+    // Select the smallest element in arr[i:n-1]
+    let j = i;
+    for(let k = i+1; k < arr.length; k++){
+      if(comp(arr[j],arr[k]) > 0){
+        j = k;
+      }
+    }
+    // And swap it with the bottom of arr[i]
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+}
+```
+
+One important thing to note here is that our separation is only valid because
+we are using a completely random comparator. With a normal comparator, the comparisons
+would be able to pass data along by mutating the array. Our comparator doesn't care
+about the data in the array though, so it is valid to separate.
+
+If we can separate it into steps, then we can generate the histograms independently
+and then combine then back into the full histogram. We can generate this full histogram
+by computing where an element starting at `i` will end up. We can use the first histogram
+to figure out the distribution of where that element would end up. Then, for each
+location in that distribution, we could compute where the element would finally
+end up. The math associated with the above explanation is equivilant to a matrix
+multiplcation.
+
+As javascript does not have a matrix multiplication built in and I don't want to
+bring in a library. I implemented it as:
+
+```
+function compose(f,g){
+  var n = f.length;
+  var out = (new Array(n)).fill(0).map(()=>new Array(n).fill(0));
+  for(var x = 0; x < n; x++){
+    let h = f[x];
+    for(var y = 0; y < n; y++){
+      let i = g[y];
+      for(var k = 0; k < n;k++){ //rescale i by h[y] and add to out[x]
+        out[x][k] += h[y]*i[k];
+      }
+    }
+  }
+  return out;
+}
+```
+
+If you are not convinced that we can reconstruct the original graph, it will be
+demonstrated that it does indeed work in the next section.
+
 ### [Heap Sort](https://en.wikipedia.org/wiki/Heap_sort)
 
 Heap Sort manipulates the array into a [heap](https://en.wikipedia.org/wiki/Heap_(data_structure))
@@ -366,67 +444,30 @@ This is certainly the most complex graph we have seen so far and it is much hard
 to analyse as a result.
 
 One way we can get a better understanding of it is by separating it into the `heapify`
-part and the for loop part.
+part and the for loop part (we could also separate the loop further).
 
 |    Heapify    |    Loop    |
 |---------------|------------|
 |![Heapify](images/heapify-300.png)|![Heap Loop](images/heap-loop-300.png)|
 
-*_TODO: would prefer to start with compose up front, maybe in the intro the the new section_*
-
-From this it is quite clear that `heapify` is the cause of the multiple lines and
-the loop causes the crosshatching pattern. But how do we know that the Loop image
-is an accurate representation of what Heap Sort is doing; the setup to it is commented
-out so how can its graph be valid on its own.
-
-We can answer that concern be trying to reassemble the original heap sort from the
-pieces. We simply need to find out how to compose one graph on top of another.
-
-*_Needs to be reworked, too dismissive:_*
-This "compose" operation can just be thought of as a matrix multiplication. The
-exact reason why "compose" is a matrix multiplication is not very important or interesting
-so it will be left as an exercise for the reader.
-
-As javascript does not have a matrix multiplication built in and I don't want to
-bring in a library. I implemented it as:
-
-```
-function compose(f,g){
-  var n = f.length;
-  var out = (new Array(n)).fill(0).map(()=>new Array(n).fill(0));
-  for(var x = 0; x < n; x++){
-    let h = f[x];
-    for(var y = 0; y < n; y++){
-      let i = g[y];
-      for(var k = 0; k < n;k++){ //rescale i by h[y] and add to out[x]
-        out[x][k] += h[y]*i[k];
-      }
-    }
-  }
-  return out;
-}
-```
-
-Using this on the heapified graph and loop graph we find that it is statistically
-indistinguishable from the normal Heap Sort graph.
+A quick sanity check to make sure our composition works shows taht the composition graph is statistically
+indistinguishable from the normal Heap Sort graph (they are actually different due to random sampling).
 
 |    Compose(Heapify,Loop)   |    Heap Sort    |
 |----------------------------|-----------------|
 |![Composed Heap Sort](images/composed-heap-300.png)|![Heap Sort](images/heap-300.png)|
 
-One important thing to note here is that our "composition" only matches because
-we are using a completely random comparator, as long as we don't break any ifs this
-is valid. With a normal comparator, it would not be valid because the loop depends
-on the values swapped in heapify.
-
-In heapify notice that each line has a line that has twice its slope and half its
-slope. If we changed, the binary heap to a ternary heap or some higher [d-ary heap](https://en.wikipedia.org/wiki/D-ary_heap)
-I would expect the slopes to correlate because they come from swapping parents
-width children.
+From this it is quite clear that `heapify` is the cause of the multiple lines and
+the loop causes the crosshatching pattern. Notice that each line has a line that
+has twice its slope and half its slope. If we changed, the binary heap to a ternary
+heap or some higher [d-ary heap](https://en.wikipedia.org/wiki/D-ary_heap). I would
+expect the slopes to correlate because they come from swapping parents width children.
 
 |  Binary  |  Ternary  |  4-ary  |
 |----------|-----------|---------|
 |![Heap Sort](images/heap-50.png)|![Ternary Heap Sort](images/ternary-heap-50.png)|![4ary Heap Sort](images/4ary-heap-50.png)|
+
+And it does.
 
 The loop is a little harder to come to a good understanding of. The pattern on the
 left is from moving the first most element to the end of the array in each iteration.
