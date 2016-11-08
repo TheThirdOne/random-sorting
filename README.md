@@ -7,7 +7,7 @@ important, and the algorithm is a black box.
 
 Techniques such as timing analysis and fuzz testing both aid reverse engineering,
 but are no longer algorithm analysis and instead are simply methods of reverse engineering.
-They would no be used to if the code was known.
+They would not be used to if the code was known.
 
 If we are not allowed to inspect the code and only have access to a function, we
 can only really abuse the input. If the conditions of the algorithm are met, correctness
@@ -45,10 +45,10 @@ the problem with using code like `arr.sort(()=>Math.floor(Math.random()*3)-1)` t
 shuffle an array.
 
 The problem with this is that it does not actually shuffle the array, it randomly
-sorts it. The first element may often stay where it is. As most algorithms try to
+sorts it [^1]. The first element may often stay where it is. As most algorithms try to
 avoid unneccessary swaps, this would be a likely case.
 
-Note: A correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+[^1]: A correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 
 ## Warning / Expectations
 
@@ -76,9 +76,11 @@ Because we will be using randomness, a single input array could become  one of m
 output arrays. So we will need a method to describe the probability distribution
 of the output.
 
-So we will be using a 2D histogram (think 2D array of probabilities) where each
+So we will be using a 2D histogram (think 2D array of probabilities)[^2] where each
 element `histogram[x][y]` is the probability of the element at `arr[x]` ending up
 at `arr[y]` after the algorithm finishes.
+
+[^2]: Alternatively it can be thought of as a [stochastic matrix](https://en.wikipedia.org/wiki/Stochastic_matrix)
 
 And that will be displayed as an image with each pixel (or group of pixels)
 representing an element `h[x][y]` and using hue to represent its value. Purple will
@@ -91,8 +93,6 @@ graph at a time.
 The full scale looks like:
 
 ![Scale](images/scale.png)
-
-**_Ignore the secondary histogram below all the graphs, it will be gone in future versions_**
 
 For example, a histogram of an algorithm that does nothing looks like:
 
@@ -140,37 +140,14 @@ hist(300,(arr,comp)=>arr.sort(comp));
 
 You are not expected to understand the pattern in that yet, but by the end of the post you should be able to.
 
-## Array.sort
-
-The main sorting algorithm(s) that started this was Array.sort so it makes sense
-to show those histograms first. These will also be the most complicated graphs so
-it will show what we will build up to being able to understand.
-
-We will be looking at both the [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine))(Chrome)
-and [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey)(Firefox) implementations
-of Array.sort
-
-Note: For these tests Chrome is *_Version as of final rendering_*; Firefox is  *_Version as of final rendering_*
-
-Note: for non-built in methods assume Chrome  *_Version as of final rendering_* was used, but it should
-not change any results as the javascript sorts should perform identically.
-
-|   n   |     10     |     30     |     50     |     100     |     300     |
-|-------|------------|------------|------------|-------------|-------------|
-|Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
-|Firefox|![FArray.sort-10](images/FArray.sort-10.png)|![FArray.sort-30](images/FArray.sort-30.png)|![FArray.sort-50](images/FArray.sort-50.png)|![FArray.sort-100](images/FArray.sort-100.png)|![FArray.sort-300](images/FArray.sort-300.png)|
-
-Note: Varying array lengths `n` are used shown because some of the features of the graph may be clearer at a lower resolution, and for Chrome specifically, `n=10` vs `n=30` are very different graphs.
-
-Based simply on these histograms, can you guess which algorithm Chrome is using?
-If you can, that is very impressive; if you can't, it should become more clear
-as we continue and look at known algorithms' graphs.
-
 ## Simple Sorts
 
 Here the simple sorts: Bubble sort, Insertion Sort and Selection sort will provide
 the introduction to matching known sorts to their histograms. These sorts are quite
 simple and have relatively easy to understand graphs.
+
+Note: Varying array lengths `n` are used shown because some of the features of the
+graph may be clearer at a lower resolution.
 
 |    n    |     10     |     30     |     50     |     100     |     300     |
 |---------|------------|------------|------------|-------------|-------------|
@@ -474,7 +451,9 @@ left is from moving the first most element to the end of the array in each itera
 This causes `arr[0]` to always end up in `arr[n-1]`; subsequent iterations are not
 that clear cut though because `siftDown` is called.  There are still a few lines
 like the ones in heapify, but they are overshadowed by the pattern on the top of
-the main line which leads to the crosshatching pattern in the heap sort.
+the main line which leads to the crosshatching pattern in the heap sort. [^6]
+
+[^6]: Further composition analysis could be done on the internals on the loop
 
 Looking at heap sort as a whole with this new understanding, may emphasize and explain
 the pattern in the bottom left. The exact reason the lines and the crosshatching
@@ -655,6 +634,20 @@ Now that we have a decent understanding of most of the major sorting algorithms,
 and how to interpret these graphs we can now begin to try to reverse engineer how
 Array.sort was implemented.
 
+We will be looking at both the [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine))(Chrome)
+and [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey)(Firefox) implementations
+of Array.sort [^3] [^4]
+
+[^3]: For these tests Chrome is *_Version as of final rendering_*; Firefox is  *_Version as of final rendering_*
+
+[^4]: For non-built in methods assume Chrome  *_Version as of final rendering_* was used, but it should
+not change any results as the javascript sorts should perform identically.
+
+|   n   |     10     |     30     |     50     |     100     |     300     |
+|-------|------------|------------|------------|-------------|-------------|
+|Chrome |![Array.sort-10](images/Array.sort-10.png)|![Array.sort-30](images/Array.sort-30.png)|![Array.sort-50](images/Array.sort-50.png)|![Array.sort-100](images/Array.sort-100.png)|![Array.sort-300](images/Array.sort-300.png)|
+|Firefox|![FArray.sort-10](images/FArray.sort-10.png)|![FArray.sort-30](images/FArray.sort-30.png)|![FArray.sort-50](images/FArray.sort-50.png)|![FArray.sort-100](images/FArray.sort-100.png)|![FArray.sort-300](images/FArray.sort-300.png)|
+
 ### FireFox's Implementation
 
 Just a quick reminder/reference, this is what the graphs for Firefox looked like.
@@ -759,14 +752,12 @@ I can't infer from the graphs what the difference in our implementations is. So
 I am going to cheat a little and look at the source code of spider monkey.
 
 Surprisingly, it is quite easy to find the sorting code by looking through the
-[source](https://github.com/mozilla/gecko-dev/) on github. Just look at
+[gecko repo](https://github.com/mozilla/gecko-dev/) on github. Just look at
 [jsarray.cpp](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp)
 (The obvious place to look for Array methods) and see that [MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L1753)
 is called, but not defined in the file so it must be in one of the headers. [ds/Sort.h](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L28)
 seems quite promising. In there we find the [definition of MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L82)
 and some [helper methods](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L18).
-
-Note: if you don't really care not looking at the source code won't affect anything; it is very similar to the code here.
 
 And looking through, our implementation is strikingly similar to Spidemonkey's (this _may_ not be purely coincidental).
 It may be hard to see how the graphs are so different, when the implementations
@@ -1163,5 +1154,7 @@ As this is on Github, if you feel like adding an interesting hybrid sort here, f
 free to make a Pull request to add it.
 
 ### Shell Sort
+
 ### Comb Sort
+
 ### Cocktail Shaker Sort
