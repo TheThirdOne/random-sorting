@@ -1,19 +1,26 @@
-# Analysis of Sorting Algorithms using randomized Comparators
+# Analysis of Sorting Algorithms using Randomized Comparators
 
-Sorting Algorithms are normally analyzed using broad strokes and leave the finer
-details up to the particular implementation and require knowing the code of the
-algorithm in question. For reverse engineering, though, implementation details are
-important, and the algorithm is a black box.
+Analysis of algorithms is generally restricted to complexity analysis. Which ignores
+all factors of an algorithm which don't affect the asymptotic behaviour. Many of
+those factors can be important for understanding the behaviour in general. This
+post will demonstrate a possibility for better analyzing the finer details of algorithms.
 
-Techniques such as timing analysis and fuzz testing both aid reverse engineering,
-but are no longer algorithm analysis and instead are simply methods of reverse engineering.
-They would not be used to if the code was known.
+In reverse engineering, the implementation details may be critical to understanding
+or reproducing how some algorithm works. Timing analysis and fuzz testing are effective
+at reconstruction an algorithm if only a black box was available, but fail to provide
+any new insight into a known algorithm.
 
-If we are not allowed to inspect the code and only have access to a function, we
-can only really abuse the input. If the conditions of the algorithm are met, correctness
-is guaranteed for all algorithms. Generally, sorting algorithms require [total order](https://en.wikipedia.org/wiki/Total_order)
-for all elements of the array. But by not meeting all the conditions of the algorithms,
-we can tease out extra information.
+The technique proposed in this post will have parallels to both traditional analysis
+and reverse engineering. It will be possible to analyze a black box, but having
+access to known algorithms that are related is also essential. Like with fuzz testing,
+we will be pulling more information out of an algorithm by giving it unexpected inputs.
+
+Assuming that our input to a sorting algorithm is well formed, all sorting correct
+algorithms must result in the same output. So in order to analyze sorting algorithms
+as a black box, we must abuse the input somehow. Generally, sorting algorithms require [total order](https://en.wikipedia.org/wiki/Total_order)
+for all elements of the array. The notation of `>` and `<` is not necessarily built-in
+for the elements in the array, though. So many implementations will expect a comparator
+(a function the takes two elements and returns the relation between them).
 
 The algorithms we will be analyzing will expect a comparator like:
 
@@ -23,15 +30,12 @@ The algorithms we will be analyzing will expect a comparator like:
             1 if x > y
 ```
 
-This is a common option for sorting algorithms because it provides a way for all
-possible inputs have `>`, `=`, and `<` defined.
-
-The conditions we will be breaking are:
+And we will be breaking all of the conditions of total order:
   - Totality: a <= b or b <= a
   - Antisymmetry: if a >= b and b <= a, a = b
   - Transitivity: if a >= b and b >= c, a >= c
 
-This will be done by defining a random comparator.
+By defining a random comparator.
 
 ```
   c(x,y) = uniformly randomly select from [-1,0,1]
