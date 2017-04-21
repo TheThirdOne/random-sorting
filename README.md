@@ -52,6 +52,7 @@ The problem with this is that it does not actually shuffle the array, it randoml
 sorts it [^1]. The first element may often stay where it is. As most algorithms try to
 avoid unneccessary swaps, this would be a likely case.
 
+Also, a [blog post](https://bost.ocks.org/mike/algorithms/) from Mike Bostock inspired the graphs. I am going with "inspired " " despite that they are nealy identical copies of his style of graph, because at the time of writing I couldn't remember where I saw that type of graph from so I simply did what looked good.
 [^1]: A correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 
 ## Warning / Expectations
