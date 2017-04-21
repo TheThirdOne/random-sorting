@@ -1,6 +1,7 @@
 function hist(n,sort){
   // Make an empty nxn array and empty array
-  var h = (new Array(n).fill(0)).map(()=>(new Array(n)).fill(0));
+  var h = makeArray(n,2)
+  var h = makeArray(n,2);
   var arr = (new Array(n)).fill(0);
   
   var randomComparator = ()=>Math.floor(Math.random()*3-1);
@@ -18,6 +19,14 @@ function hist(n,sort){
   }
   return h;
 }
+
+function makeArray(n,d){
+  if(d == 1){
+    return new Array(n).fill(0);
+  }
+  return new Array(n).fill(0).map(()=>makeArray(n,d-1));
+}
+
 function bounds(hist2){
   var total = 0, s = sum(hist2);
   var a, b;
@@ -57,8 +66,7 @@ function computeHist2(hist){
 }
 var sum = (a)=>a.reduce((a,b)=>a+b,0);
 
-function graph(hist){
-  var c = document.createElement('canvas');
+function graph(hist, c = document.createElement('canvas')){
   c.width = 300;
   c.height = 300;
   var ctx = c.getContext('2d');
