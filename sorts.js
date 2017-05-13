@@ -1,3 +1,5 @@
+var sorts = {bubbleSort, insertionSort, selectionSort, heapSort, mergeSort, quickSort, mergeInsertSort, quickInsertSort,quickInsertSort2,shellSort,mergeSortTopDown};
+
 // Simple Algorithms
 // Bubble, Insertion, Selection
 function bubbleSort(arr,comp){
@@ -9,7 +11,6 @@ function bubbleSort(arr,comp){
     }
   }
 }
-
 
 function insertionSort(arr,comp){
   // Build a sorted array 1 element at a time.

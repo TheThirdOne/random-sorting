@@ -6,6 +6,18 @@ function show(url){
   document.body.appendChild(img);
 }
 
+function show2(hist){
+  var canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 300;
+  canvas.onmousemove = function(e){
+    var x = e.offsetX/(300/hist.length)|0;
+    var y = e.offsetY/(300/hist.length)|0;
+    graph(hist[x][y],canvas);
+  };
+  document.body.appendChild(canvas);
+  graph(hist[0][0],canvas);
+}
+
 // Downloads URL as PNG
 // Note: Doesn't seem to work in FireFox
 function download(url,name){

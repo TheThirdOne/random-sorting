@@ -1,6 +1,5 @@
 function hist(n,sort){
   // Make an empty nxn array and empty array
-  var h = makeArray(n,2)
   var h = makeArray(n,2);
   var arr = (new Array(n)).fill(0);
   
@@ -15,6 +14,29 @@ function hist(n,sort){
     for(var k = 0; k < n;k++){
       // Use the initial index (the value of the cell) and the final index (k) to update the histogram
       h[arr[k]][k]++;
+    }
+  }
+  return h;
+}
+
+function hist2(n,sort){
+  // Make an empty nxn array and empty array
+  var h = makeArray(n,4);
+  var arr = (new Array(n)).fill(0);
+  
+  var randomComparator = ()=>Math.floor(Math.random()*3-1);
+  
+  // Run the sort 100000 times
+  for(var i = 0; i < 100000; i++){
+    if(i === 50000)
+      console.log('halfway');
+    arr = arr.map((_,i)=>i); // convert each element into its index
+    sort(arr,randomComparator);
+    for(var k = 0; k < n;k++){
+      for(var j = 0; j < n;j++){
+        // Use the initial index (the value of the cell) and the final index (k) to update the histogram
+        h[j][k][arr[j]][arr[k]]++;
+      }
     }
   }
   return h;
