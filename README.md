@@ -228,9 +228,8 @@ position for most elements, the edges are slightly more complicated). My display
 system is not accurate enough to see when `d > ~5`; so we can only see a slight
 change is distribution at the first and last elements.
 
-*_Needs to be reworked, too dismissive:_*
-Showing how that edge conditions works will be left as an exercise for the reader
-as the math is relatively simple, but too time consuming to detail here.
+A good execersise to check your understanding is to see if you can calculate the
+probability of the first element staying in place is.
 
 ### [Selection Sort](https://en.wikipedia.org/wiki/Selection_sort)
 
@@ -443,7 +442,7 @@ From this it is quite clear that `heapify` is the cause of the multiple lines an
 the loop causes the crosshatching pattern. Notice that each line has a line that
 has twice its slope and half its slope. If we changed, the binary heap to a ternary
 heap or some higher [d-ary heap](https://en.wikipedia.org/wiki/D-ary_heap). I would
-expect the slopes to correlate because they come from swapping parents width children.
+expect the slopes to correlate because they come from swapping parents with children.
 
 |  Binary  |  Ternary  |  4-ary  |
 |----------|-----------|---------|
