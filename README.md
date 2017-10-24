@@ -31,6 +31,7 @@ The algorithms we will be analyzing will expect a comparator like:
 ```
 
 And we will be breaking all of the conditions of total order:
+
   - Totality: a <= b or b <= a
   - Antisymmetry: if a >= b and b <= a, a = b
   - Transitivity: if a >= b and b >= c, a >= c
@@ -74,6 +75,14 @@ deep understanding.
 
 This is a fairly lengthy read; it should take around an hour to read thoroughly
 if you know most of the pure sorting algorithms.
+
+## Github
+
+All of the code used to make the visualizations, the generated images, and the
+article itself are on [Github](https://github.com/TheThirdOne/random-sorting/). 
+
+If you find an issue (like a typo or broken link), please [file an issue](https://github.com/TheThirdOne/random-sorting/issues)
+or submit a [pull request](https://github.com/TheThirdOne/random-sorting/pulls).
 
 ## Histogram
 
@@ -1135,6 +1144,7 @@ Two methods that may have very similar code, but a slight difference such as an 
 if, might generate very different graphs.
 
 Hints for applying this type of technique to other types of problems:
+
   - Find undefined behaviour that would differentiate algorithms
     - All sorting algorithms give the same final result (disregarding stability) if the comparator fulfills a few conditions (reflexive, antisymmetric, transitive)
     - Randomness abuses all three and thus the output is undefined
@@ -1144,9 +1154,10 @@ Hints for applying this type of technique to other types of problems:
 ### Next Steps
 
 Some possible ways to build off this:
+
   - Try using a different random comparator eg make it change the probabilities of 1 -1 and 0
   - Try testing other sort implementations such as Opera's and Edge/IE's
-    - A PR for this would be welcomed
+    - A Pull Request for this would be welcomed
   - Try having the comparator only sometimes be random
   
 ## Appendix: More Hybrid Sorts
@@ -1157,7 +1168,9 @@ include them here. Analysis will be foregone for sake of space and my time.
 As this is on Github, if you feel like adding an interesting hybrid sort here, feel
 free to make a Pull request to add it.
 
-### Shell Sort
+|  n  |     10     |     30     |     50     |     100     |     300     |
+|-----|------------|------------|------------|-------------|-------------|
+|Shell Sort |!shell-10](images/shell-10.png)|![shell-30](images/shell-30.png)|![shell-50](images/shell-50.png)|![shell-100](images/shell-100.png)|![shell-300](images/shell-300.png)
 
 ### Comb Sort
 
