@@ -653,8 +653,7 @@ of Array.sort [^3] [^4]
 
 [^3]: For these tests Chrome is *_Version as of final rendering_*; Firefox is  *_Version as of final rendering_*
 
-[^4]: For non-built in methods assume Chrome  *_Version as of final rendering_* was used, but it should
-not change any results as the javascript sorts should perform identically.
+[^4]: For non-built in methods assume Chrome  *_Version as of final rendering_* was used, but it should not change any results as the javascript sorts should perform identically.
 
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
@@ -776,11 +775,9 @@ And looking through, our implementation is strikingly similar to Spidemonkey's (
 It may be hard to see how the graphs are so different, when the implementations
 are so similar.
 
-The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L41):
+The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L41)[^6]:
 
-Note this check simply allows it to be slightly faster than the naive implementation,
-it does not affect correctness (assuming that the comparator is transitive
-ie ((a > b), (b > c) -> (a > c))) or Big O runtime.
+[^6]: Note this check simply allows it to be slightly faster than the naive implementation, it does not affect correctness (assuming that the comparator is transitive ie ((a > b), (b > c) -> (a > c))) or Big O runtime.
 
 ```
 if (!lessOrEqual) {
