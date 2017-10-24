@@ -79,7 +79,7 @@ if you know most of the pure sorting algorithms.
 ## Github
 
 All of the code used to make the visualizations, the generated images, and the
-article itself are on [Github](https://github.com/TheThirdOne/random-sorting/). 
+article itself are on [Github](https://github.com/TheThirdOne/random-sorting/).
 
 If you find an issue (like a typo or broken link), please [file an issue](https://github.com/TheThirdOne/random-sorting/issues)
 or submit a [pull request](https://github.com/TheThirdOne/random-sorting/pulls).
@@ -1168,7 +1168,5 @@ free to make a Pull request to add it.
 |  n  |     10     |     30     |     50     |     100     |     300     |
 |-----|------------|------------|------------|-------------|-------------|
 |Shell Sort |!shell-10](images/shell-10.png)|![shell-30](images/shell-30.png)|![shell-50](images/shell-50.png)|![shell-100](images/shell-100.png)|![shell-300](images/shell-300.png)
-
-### Comb Sort
-
-### Cocktail Shaker Sort
+|Comb Sort |!comb-10](images/comb-10.png)|![comb-30](images/comb-30.png)|![comb-50](images/comb-50.png)|![comb-100](images/comb-100.png)|![comb-300](images/comb-300.png)
+|Cocktail Sort |!cocktail-10](images/cocktail-10.png)|![cocktail-30](images/cocktail-30.png)|![cocktail-50](images/cocktail-50.png)|![cocktail-100](images/cocktail-100.png)|![cocktail-300](images/cocktail-300.png)

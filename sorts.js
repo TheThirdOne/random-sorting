@@ -416,6 +416,38 @@ function shellSort(arr,comp){
   }
 }
 
+function combSort(arr, comp){
+  for(let gap = arr.length; gap > 1; gap = Math.floor((gap*2)/3)){
+    for(let k = gap; k < arr.length; k++){
+      if(comp(arr[k-gap],arr[k]) > 0){
+        [arr[k],arr[k-gap]] = [arr[k-gap],arr[k]];
+      }
+    }
+  }
+  for(let k = 1; k < arr.length; k++){
+    if(comp(arr[k-1],arr[k]) > 0){
+      [arr[k],arr[k-1]] = [arr[k-1],arr[k]];
+    }
+  }
+}
+
+
+function cocktailSort(arr,comp){
+  for(let i = 1; i < Math.floor(arr.length / 2); i++){
+    for(let k = i; k < arr.length-i; k++){
+      if(comp(arr[k],arr[k+1]) > 0){
+        [arr[k],arr[k+1]] = [arr[k+1],arr[k]];
+      }
+    }
+    for(let k = arr.length-i-1; k >= i; k--){
+      if(comp(arr[k],arr[k-1]) < 0){
+        [arr[k],arr[k-1]] = [arr[k-1],arr[k]];
+      }
+    }
+  }
+}
+
+
 // Top Down implementation of merge sort
 // Included for reference
 function mergeSortTopDown(arr,comp){

@@ -157,7 +157,12 @@ var jsSorts = [ [10, ()=>0, 'forward'], [10, (a)=>a.reverse(), 'backward'],     
   [5, insertionSort,    'insertion-5'],[12, insertionSort,    'insertion-12'],[15, insertionSort,    'insertion-15'],
   ...standard(quickInsertSort, 'quick-insert'),
   ...standard(quickInsertSort2,'quick-insert2'),
-  [100, quickInsertSort3(20), 'quick-insert-20-100'],[100, quickInsertSort3(30), 'quick-insert-30-100'],[100, quickInsertSort3(40), 'quick-insert-40-100'],[100, quickInsertSort3(50), 'quick-insert-50-100']
+  [100, quickInsertSort3(20), 'quick-insert-20-100'],[100, quickInsertSort3(30), 'quick-insert-30-100'],[100, quickInsertSort3(40), 'quick-insert-40-100'],[100, quickInsertSort3(50), 'quick-insert-50-100'],
+  
+  // Extra sorts
+  ...standard(shellSort, 'shell'),
+  ...standard(combSort,'comb'),
+  ...standard(cocktailSort,'cocktail')
   ]
 
 var chromeSorts = [
