@@ -636,7 +636,6 @@ That pattern alone I believe is responsible for most of the pattern of the graph
 In each recursive call, the location of the last index changes, but the pattern around
 it stays the same.
 
-**_Would prefer a better way to not go into this, but it seems like it will be neccessary as this section is really short otherwise:_**
 A more complex attempt at composition could give a more rigorous and meaningful analysis,
 but that would be a somewhat involved process and may not make it any clearer. So for
 the sake of time, it will be omitted.
@@ -767,17 +766,17 @@ I am going to cheat a little and look at the source code of spider monkey.
 
 Surprisingly, it is quite easy to find the sorting code by looking through the
 [gecko repo](https://github.com/mozilla/gecko-dev/) on github. Just look at
-[jsarray.cpp](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp)
-(The obvious place to look for Array methods) and see that [MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L1753)
-is called, but not defined in the file so it must be in one of the headers. [ds/Sort.h](https://github.com/mozilla/gecko-dev/blob/master/js/src/jsarray.cpp#L28)
-seems quite promising. In there we find the [definition of MergeSort](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L82)
-and some [helper methods](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L18).
+[jsarray.cpp](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/jsarray.cpp)
+(The obvious place to look for Array methods) and see that [MergeSort](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/jsarray.cpp#L1899)
+is called, but not defined in the file so it must be in one of the headers. [ds/Sort.h](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/jsarray.cpp#L28)
+seems quite promising. In there we find the [definition of MergeSort](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/ds/Sort.h#L82)
+and some [helper methods](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/ds/Sort.h#L18).
 
 And looking through, our implementation is strikingly similar to Spidemonkey's (this _may_ not be purely coincidental).
 It may be hard to see how the graphs are so different, when the implementations
 are so similar.
 
-The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/master/js/src/ds/Sort.h#L41)[^6]:
+The one missing thing is [this check](https://github.com/mozilla/gecko-dev/blob/6e8e617ff4f01ed3213637847cd1e01825e62afd/js/src/ds/Sort.h#L41)[^6]:
 
 [^6]: Note this check simply allows it to be slightly faster than the naive implementation, it does not affect correctness (assuming that the comparator is transitive ie ((a > b), (b > c) -> (a > c))) or Big O runtime.
 
@@ -1019,12 +1018,12 @@ make our current guess better.
 #### Some more Cheating
 
 Like with FireFox's source, [v8's source](https://github.com/v8/v8/) is also on
-Github. Then looking in the most obvious file [array.js](https://github.com/v8/v8/blob/master/src/js/array.js),
-we find [InnerArraySort](https://github.com/v8/v8/blob/master/src/js/array.js#L710)
+Github. Then looking in the most obvious file [array.js](https://github.com/v8/v8/blob/35b6aa38497fdd1ea08af7d4042528c645826b06/src/js/array.js),
+we find [InnerArraySort](https://github.com/v8/v8/blob/35b6aa38497fdd1ea08af7d4042528c645826b06/src/js/array.js#L707)
 which implements Array.sort. There are a bunch of extra checks in that function,
-but we only really care about up till [line 844](https://github.com/v8/v8/blob/master/src/js/array.js#L844).
-Disregarding [GetThirdIndex](https://github.com/v8/v8/blob/master/src/js/array.js#L742)
-and some checks, we have effectively identical code up to [line 804](https://github.com/v8/v8/blob/master/src/js/array.js#L804).
+but we only really care about up till [line 841](https://github.com/v8/v8/blob/35b6aa38497fdd1ea08af7d4042528c645826b06/src/js/array.js#L841).
+Disregarding [GetThirdIndex](https://github.com/v8/v8/blob/35b6aa38497fdd1ea08af7d4042528c645826b06/src/js/array.js#L39)
+and some checks, we have effectively identical code up to [line 805](https://github.com/v8/v8/blob/35b6aa38497fdd1ea08af7d4042528c645826b06/src/js/array.js#L805).
 
 Note that:
 
