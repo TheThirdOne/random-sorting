@@ -651,7 +651,7 @@ We will be looking at both the [V8](https://en.wikipedia.org/wiki/V8_(JavaScript
 and [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey)(Firefox) implementations
 of Array.sort [^3] [^4]
 
-[^3]: For these tests Chrome is Version 61; Firefox is Version 56.
+[^3]: For these tests Chrome is Version 61; Firefox is Version 45.
 
 [^4]: For non-built in methods assume Chrome was used (becuase automatic downloading doesn't work in Firefox), but it should not change any results as the Javascript sorts should perform identically.
 
@@ -662,6 +662,8 @@ of Array.sort [^3] [^4]
 
 ### FireFox's Implementation
 
+*Note*: More recent versions of Firefox have a slighlty different sorting algorithm.
+ 
 Just a quick reminder/reference, this is what the graphs for Firefox looked like.
 
 |   n   |     10     |     30     |     50     |     100     |     300     |
