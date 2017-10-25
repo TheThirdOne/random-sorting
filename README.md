@@ -45,15 +45,15 @@ By defining a random comparator.
 ## Inspiration
 
 In [a tangential conversation](https://news.ycombinator.com/item?id=12568194) on
-Hacker News, [RKoutnik](https://news.ycombinator.com/user?id=RKoutnik) figure out
+Hacker News, [RKoutnik](https://news.ycombinator.com/user?id=RKoutnik) figured out
 the problem with using code like `arr.sort(()=>Math.floor(Math.random()*3)-1)` to
 shuffle an array.
 
 The problem with this is that it does not actually shuffle the array, it randomly
-sorts it [^1]. The first element may often stay where it is. As most algorithms try to
-avoid unneccessary swaps, this would be a likely case.
+sorts it [^1]. The first element may often stay where it is. As most sorting algorithms
+try to avoid unneccessary swaps, seems reasonable. 
 
-Also, a [blog post](https://bost.ocks.org/mike/algorithms/) from Mike Bostock inspired the graphs. I am going with "inspired " " despite that they are nealy identical copies of his style of graph, because at the time of writing I couldn't remember where I saw that type of graph from so I simply did what looked good.
+Also, a [blog post](https://bost.ocks.org/mike/algorithms/) from Mike Bostock inspired the graphs. I am going with "inspired" despite that they are nealy identical copies of his style of graph, because at the time of writing I couldn't remember where I saw that type of graph from so I simply did what looked good.
 [^1]: A correct way to do this is with [Fisher-Yates Shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
 
 ## Warning / Expectations
@@ -274,11 +274,8 @@ than to have this type of pattern hold.
 Therefore if we change  `if(comp(arr[j],arr[k]) > 0){` to `if(comp(arr[j],arr[k]) >= 0){`,
 then the `~1/3` should change to `~2/3` and the behaviour at the end should narrow.
 
-*_Needs to be reworked, figure it out:_*
-I have not worked out the math for exactly where the cut off should be for the
-tradeoff between those two patterns, and am also unsure on how exactly the pattern
-arises aside from what I have stated above. If you think you understand it well
-please create an issue on github.
+The exact cutoff point for the switch between the two patterns is a little more
+complicated to derive and will be left out for the sake of brevity.
 
 ## Complex / Efficient Sorts
 
@@ -464,9 +461,9 @@ left is from moving the first most element to the end of the array in each itera
 This causes `arr[0]` to always end up in `arr[n-1]`; subsequent iterations are not
 that clear cut though because `siftDown` is called.  There are still a few lines
 like the ones in heapify, but they are overshadowed by the pattern on the top of
-the main line which leads to the crosshatching pattern in the heap sort. [^6]
+the main line which leads to the crosshatching pattern in the heap sort. [^3]
 
-[^6]: Further composition analysis could be done on the internals on the loop
+[^3]: Further composition analysis could be done on the internals on the loop
 
 Looking at heap sort as a whole with this new understanding, may emphasize and explain
 the pattern in the bottom left. The exact reason the lines and the crosshatching
@@ -648,11 +645,11 @@ Array.sort was implemented.
 
 We will be looking at both the [V8](https://en.wikipedia.org/wiki/V8_(JavaScript_engine))(Chrome)
 and [SpiderMonkey](https://en.wikipedia.org/wiki/SpiderMonkey)(Firefox) implementations
-of Array.sort [^3] [^4]
+of Array.sort [^4] [^5]
 
-[^3]: For these tests Chrome is Version 61; Firefox is Version 45.
+[^4]: For these tests Chrome is Version 61; Firefox is Version 45.
 
-[^4]: For non-built in methods assume Chrome was used (becuase automatic downloading doesn't work in Firefox), but it should not change any results as the Javascript sorts should perform identically.
+[^5]: For non-built in methods assume Chrome was used (becuase automatic downloading doesn't work in Firefox), but it should not change any results as the Javascript sorts should perform identically.
 
 |   n   |     10     |     30     |     50     |     100     |     300     |
 |-------|------------|------------|------------|-------------|-------------|
@@ -997,7 +994,7 @@ This algorithm looks like:
 |Quick Insert + new Partition|![quick-insert-10](images/quick-insert-10.png)|![quick-insert-30](images/quick-insert-30.png)|![quick-insert-50](images/quick-insert-50.png)|![quick-insert-100](images/quick-insert-100.png)|![quick-insert-300](images/quick-insert-300.png)|
 
 Ok, that is definitely much closer than a pure quicksort. For `n=10` we get the
-insertion Sort as expected and we know do have those vertical lines at the bottom,
+insertion Sort as expected and we now do have those vertical lines at the bottom,
 midpoint and top. However, we are still missing something, the big red spot in the
 middle of the Array.sort graph is completely absent in this one.
 
@@ -1122,9 +1119,9 @@ Interesting aside:
 
 Changing the cutoff for using insertion sort can perhaps help us understand why this patterns occurs.
 
-|   n   |     20     |     30     |     40     |     50     |
-|-------|------------|------------|------------|------------|
-||![quick-insert-20-100](images/quick-insert-20-100.png)|![quick-insert-30-100](images/quick-insert-30-100.png)|![quick-insert-40-100](images/quick-insert-40-100.png)|![quick-insert-50-100](images/quick-insert-50-100.png)|
+|     20     |     30     |     40     |     50     |
+|------------|------------|------------|------------|
+|![quick-insert-20-100](images/quick-insert-20-100.png)|![quick-insert-30-100](images/quick-insert-30-100.png)|![quick-insert-40-100](images/quick-insert-40-100.png)|![quick-insert-50-100](images/quick-insert-50-100.png)|
 
 ## Final Words
 
@@ -1169,6 +1166,6 @@ free to make a Pull request to add it.
 
 |  n  |     10     |     30     |     50     |     100     |     300     |
 |-----|------------|------------|------------|-------------|-------------|
-|Shell Sort |!shell-10](images/shell-10.png)|![shell-30](images/shell-30.png)|![shell-50](images/shell-50.png)|![shell-100](images/shell-100.png)|![shell-300](images/shell-300.png)
-|Comb Sort |!comb-10](images/comb-10.png)|![comb-30](images/comb-30.png)|![comb-50](images/comb-50.png)|![comb-100](images/comb-100.png)|![comb-300](images/comb-300.png)
-|Cocktail Sort |!cocktail-10](images/cocktail-10.png)|![cocktail-30](images/cocktail-30.png)|![cocktail-50](images/cocktail-50.png)|![cocktail-100](images/cocktail-100.png)|![cocktail-300](images/cocktail-300.png)
+|Shell Sort |![shell-10](images/shell-10.png)|![shell-30](images/shell-30.png)|![shell-50](images/shell-50.png)|![shell-100](images/shell-100.png)|![shell-300](images/shell-300.png)
+|Comb Sort |![comb-10](images/comb-10.png)|![comb-30](images/comb-30.png)|![comb-50](images/comb-50.png)|![comb-100](images/comb-100.png)|![comb-300](images/comb-300.png)
+|Cocktail Sort |![cocktail-10](images/cocktail-10.png)|![cocktail-30](images/cocktail-30.png)|![cocktail-50](images/cocktail-50.png)|![cocktail-100](images/cocktail-100.png)|![cocktail-300](images/cocktail-300.png)
