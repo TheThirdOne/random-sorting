@@ -984,6 +984,7 @@ function setupPivot(arr,comp,lo,mid,hi){
 ```
 
 This doesn't quite follow the things I laid above for a few reasons:
+
   1. I don't want to be using `[].sort` in my implementation so I inlined that
   2. For simplicity, I changed `f` to put the pivot on top and just return the pivot
   3. Optimized a little by placing the non-pivot values on the right side of the pivot and did not include them in the main partition.
