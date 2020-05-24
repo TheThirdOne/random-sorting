@@ -437,7 +437,7 @@ part and the for loop part (we could also separate the loop further).
 |---------------|------------|
 |![Heapify](images/heapify-300.png)|![Heap Loop](images/heap-loop-300.png)|
 
-A quick sanity check to make sure our composition works shows taht the composition graph is statistically
+A quick sanity check to make sure our composition works shows that the composition graph is statistically
 indistinguishable from the normal Heap Sort graph (they are actually different due to random sampling).
 
 |    Compose(Heapify,Loop)   |    Heap Sort    |
